@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'budgetData';
 
-const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'autres', 'epargne', 'sousDecote'];
+const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'epargne', 'sousDecote'];
 
 const el = {
   salaire:      () => document.getElementById('salaire'),
@@ -8,6 +8,7 @@ const el = {
   nourriture:   () => document.getElementById('nourriture'),
   assurance:    () => document.getElementById('assurance'),
   dette:        () => document.getElementById('dette'),
+  facture:      () => document.getElementById('facture'),
   autres:       () => document.getElementById('autres'),
   epargne:      () => document.getElementById('epargne'),
   sousDecote:   () => document.getElementById('sousDecote'),
@@ -36,15 +37,16 @@ function compute() {
   const nourriture = val('nourriture');
   const assurance  = val('assurance');
   const dette      = val('dette');
+  const facture    = val('facture');
   const autres     = val('autres');
   const epargne    = val('epargne');
   const sousDecote = val('sousDecote');
 
-  const totalCharges = loyer + nourriture + assurance + dette + autres;
+  const totalCharges = loyer + nourriture + assurance + dette + facture + autres;
   const resteAVivre  = salaire - totalCharges - epargne;
   const tauxEpargne  = salaire > 0 ? (epargne / salaire) * 100 : 0;
 
-  return { salaire, loyer, nourriture, assurance, dette, autres, epargne, sousDecote, totalCharges, resteAVivre, tauxEpargne };
+  return { salaire, loyer, nourriture, assurance, dette, facture, autres, epargne, sousDecote, totalCharges, resteAVivre, tauxEpargne };
 }
 
 // ── Mise à jour DOM ────────────────────────────────────────────
@@ -74,12 +76,12 @@ function updateDOM(data) {
 
 // ── Graphique Chart.js (EF-06) ─────────────────────────────────
 function updateChart(data) {
-  const { loyer, nourriture, assurance, dette, autres, epargne, resteAVivre } = data;
+  const { loyer, nourriture, assurance, dette, facture, autres, epargne, resteAVivre } = data;
 
   const restePositif = Math.max(0, resteAVivre);
-  const labels  = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Autres', 'Épargne', 'Reste à vivre'];
-  const values  = [loyer, nourriture, assurance, dette, autres, epargne, restePositif];
-  const colors  = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#f43f5e', '#06b6d4', '#a3e635'];
+  const labels  = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Factures', 'Autres', 'Épargne', 'Reste à vivre'];
+  const values  = [loyer, nourriture, assurance, dette, facture, autres, epargne, restePositif];
+  const colors  = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e', '#06b6d4', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;
