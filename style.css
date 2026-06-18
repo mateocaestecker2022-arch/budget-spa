@@ -262,20 +262,51 @@ body {
   .main-grid {
     grid-template-columns: 1fr;
     margin: 1rem auto;
-    padding: 0 1rem;
+    padding: 0 .75rem;
+    gap: 1rem;
   }
 
+  /* Header */
+  .header { padding: 1.25rem 1rem; }
+  .header h1 { font-size: 1.25rem; }
+  .header-sub { font-size: .85rem; }
+
+  /* Carte */
+  .card { padding: 1.25rem; gap: .75rem; }
+
+  /* Inputs plus grands pour les doigts */
+  .form-group input {
+    padding: .85rem 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .form-group label { font-size: .9rem; }
+
+  /* Résultats : grille 2x2 sur mobile */
   .results-grid { grid-template-columns: 1fr 1fr; }
 
-  .chart-container { height: 200px; }
+  .result-item--wide { grid-column: span 2; }
 
+  .result-value { font-size: 1.15rem; }
+
+  /* Graphique */
+  .chart-container { height: 220px; }
+
+  /* Comparaison */
   .card--compare { grid-column: span 1; }
   .compare-grid  { grid-template-columns: 1fr 1fr; }
 
-  .header { padding: 1.25rem 1rem; }
-  .header h1 { font-size: 1.3rem; }
+  /* Bouton reset */
+  .btn-reset {
+    width: 100%;
+    text-align: center;
+    padding: .85rem;
+    font-size: .95rem;
+  }
 }
 
 @media (max-width: 400px) {
-  .results-grid { grid-template-columns: 1fr; }
+  .results-grid { grid-template-columns: 1fr 1fr; }
+  .compare-grid  { grid-template-columns: 1fr 1fr; }
 }
