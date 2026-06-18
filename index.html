@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestionnaire de Budget</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <header class="header">
+    <h1>Gestionnaire de Budget</h1>
+    <p class="header-sub">Suivi mensuel de vos finances personnelles</p>
+  </header>
+
+  <main class="main-grid">
+
+    <!-- Colonne gauche : saisie -->
+    <section class="card" aria-label="Saisie des données">
+
+      <h2 class="card-title">Mes données</h2>
+
+      <div class="form-group">
+        <label for="salaire">Salaire mensuel net (€)</label>
+        <input type="number" id="salaire" min="0" step="1" placeholder="ex: 2500" />
+      </div>
+
+      <h3 class="section-label">Charges fixes</h3>
+
+      <div class="form-group">
+        <label for="loyer">Loyer (€)</label>
+        <input type="number" id="loyer" min="0" step="1" placeholder="ex: 800" />
+      </div>
+
+      <div class="form-group">
+        <label for="nourriture">Nourriture (€)</label>
+        <input type="number" id="nourriture" min="0" step="1" placeholder="ex: 400" />
+      </div>
+
+      <div class="form-group">
+        <label for="assurance">Assurance (€)</label>
+        <input type="number" id="assurance" min="0" step="1" placeholder="ex: 150" />
+      </div>
+
+      <div class="form-group">
+        <label for="dette">Dette / Remboursement (€)</label>
+        <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
+      </div>
+
+      <h3 class="section-label">Épargne</h3>
+
+      <div class="form-group">
+        <label for="epargne">Objectif d'épargne mensuelle (€)</label>
+        <input type="number" id="epargne" min="0" step="1" placeholder="ex: 300" />
+      </div>
+
+      <button class="btn-reset" id="btnReset" type="button">Réinitialiser</button>
+    </section>
+
+    <!-- Colonne droite : résultats -->
+    <section class="card" aria-label="Résultats budgétaires">
+
+      <h2 class="card-title">Mon budget</h2>
+
+      <!-- Alerte déséquilibre -->
+      <div class="alert" id="alert" role="alert" aria-live="polite" hidden>
+        Attention — votre reste à vivre est négatif !
+      </div>
+
+      <div class="results-grid">
+        <div class="result-item">
+          <span class="result-label">Total charges</span>
+          <span class="result-value" id="totalCharges">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Reste à vivre</span>
+          <span class="result-value" id="resteAVivre">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Taux d'épargne</span>
+          <span class="result-value" id="tauxEpargne">0 %</span>
+        </div>
+      </div>
+
+      <!-- Barre de progression épargne -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Progression épargne</span>
+          <span id="progressLabel">0 / 0 €</span>
+        </div>
+        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- Graphique répartition -->
+      <div class="chart-container">
+        <canvas id="budgetChart" aria-label="Répartition du budget"></canvas>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
