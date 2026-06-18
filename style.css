@@ -143,6 +143,19 @@ body {
   gap: .75rem;
 }
 
+.result-item--wide {
+  grid-column: span 3;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.result-value--savings {
+  color: var(--color-success);
+  font-size: 1.3rem;
+}
+
 .result-item {
   background: var(--color-bg);
   border-radius: 10px;

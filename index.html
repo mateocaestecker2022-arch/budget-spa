@@ -48,11 +48,21 @@
         <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
       </div>
 
+      <div class="form-group">
+        <label for="autres">Autres dépenses (€)</label>
+        <input type="number" id="autres" min="0" step="1" placeholder="ex: 100" />
+      </div>
+
       <h3 class="section-label">Épargne</h3>
 
       <div class="form-group">
         <label for="epargne">Objectif d'épargne mensuelle (€)</label>
         <input type="number" id="epargne" min="0" step="1" placeholder="ex: 300" />
+      </div>
+
+      <div class="form-group">
+        <label for="sousDecote">Sous de côté (total déjà épargné) (€)</label>
+        <input type="number" id="sousDecote" min="0" step="1" placeholder="ex: 1500" />
       </div>
 
       <button class="btn-reset" id="btnReset" type="button">Réinitialiser</button>
@@ -80,6 +90,10 @@
         <div class="result-item">
           <span class="result-label">Taux d'épargne</span>
           <span class="result-value" id="tauxEpargne">0 %</span>
+        </div>
+        <div class="result-item result-item--wide">
+          <span class="result-label">Sous de côté</span>
+          <span class="result-value result-value--savings" id="sousDecoteDisplay">0 €</span>
         </div>
       </div>
 
