@@ -25,7 +25,12 @@
 | 1 | Conception UI | ✅ Terminé |
 | 2 | Saisies et calculs | ✅ Terminé |
 | 3 | Graphiques + sauvegarde | ✅ Terminé (intégré Phase 2) |
-| 4 | Tests et recette | ✅ PASS — Playwright headless |
+| 4 | Tests et recette | ✅ PASS — Playwright 33/33 |
+| + | Champs Autres + Factures + Sous de côté | ✅ Terminé |
+| + | Réinitialisation mensuelle auto | ✅ Terminé |
+| + | Comparaison mois précédent | ✅ Terminé |
+| + | Optimisation mobile | ✅ Terminé |
+| + | Déploiement GitHub Pages | ✅ Terminé |
 
 ---
 
@@ -37,16 +42,21 @@
 
 ---
 
-## Résultats recette (2026-06-18)
+## Résultats recette finale (2026-06-18) — 33/33 PASS
 
 | Test | Résultat |
 |------|----------|
-| Formules de calcul (nominal) | ✅ Total 1 550 €, Reste 650 €, Taux 12.0 % |
-| Alerte solde négatif | ✅ Visible en rouge à -1 250 € |
-| Reset complet | ✅ Indicateurs à 0 €, storage vidé |
-| SessionStorage restauration | ✅ Données persistées après rechargement |
-| Erreurs console | ✅ Aucune |
-| Graphique Chart.js | ✅ Répartition fidèle, légende complète |
+| 9 champs présents | ✅ |
+| Formules de calcul (1 770 €, 430 €, 12.0 %) | ✅ |
+| Alerte solde négatif | ✅ Visible en rouge |
+| Graphique Chart.js (8 segments) | ✅ |
+| Barre de progression épargne | ✅ |
+| Sous de côté affiché | ✅ |
+| localStorage sauvegarde/restauration | ✅ |
+| Reset mensuel auto + report sous de côté | ✅ |
+| Section comparaison mois précédent | ✅ |
+| Mobile — inputs touch, bouton pleine largeur | ✅ |
+| Aucune erreur console | ✅ |
 
 ## Évolutions futures (hors v1.0)
 
@@ -60,3 +70,7 @@
 ## Dépôt GitHub
 
 https://github.com/mateocaestecker2022-arch/budget-spa
+
+## Application en ligne
+
+https://mateocaestecker2022-arch.github.io/budget-spa/
