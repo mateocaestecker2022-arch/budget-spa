@@ -213,6 +213,50 @@ body {
   margin-top: .5rem;
 }
 
+/* ── Comparaison mois précédent ────────────────────────────── */
+.card--compare {
+  grid-column: span 2;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .75rem;
+}
+
+.compare-item {
+  background: var(--color-bg);
+  border-radius: 10px;
+  padding: .85rem .75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+
+.compare-label {
+  font-size: .72rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.compare-prev {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.compare-delta {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.delta--up   { color: var(--color-danger); }
+.delta--down { color: var(--color-success); }
+
 /* ── Responsive mobile ─────────────────────────────────────── */
 @media (max-width: 768px) {
   .main-grid {
@@ -224,6 +268,9 @@ body {
   .results-grid { grid-template-columns: 1fr 1fr; }
 
   .chart-container { height: 200px; }
+
+  .card--compare { grid-column: span 1; }
+  .compare-grid  { grid-template-columns: 1fr 1fr; }
 
   .header { padding: 1.25rem 1rem; }
   .header h1 { font-size: 1.3rem; }

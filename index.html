@@ -11,7 +11,7 @@
 
   <header class="header">
     <h1>Gestionnaire de Budget</h1>
-    <p class="header-sub">Suivi mensuel de vos finances personnelles</p>
+    <p class="header-sub" id="headerMonth">Suivi mensuel de vos finances personnelles</p>
   </header>
 
   <main class="main-grid">
@@ -66,11 +66,11 @@
       </div>
 
       <div class="form-group">
-        <label for="sousDecote">Sous de côté (total déjà épargné) (€)</label>
+        <label for="sousDecote">Sous de côté (total cumulé) (€)</label>
         <input type="number" id="sousDecote" min="0" step="1" placeholder="ex: 1500" />
       </div>
 
-      <button class="btn-reset" id="btnReset" type="button">Réinitialiser</button>
+      <button class="btn-reset" id="btnReset" type="button">Réinitialiser le mois</button>
     </section>
 
     <!-- Colonne droite : résultats -->
@@ -118,6 +118,33 @@
         <canvas id="budgetChart" aria-label="Répartition du budget"></canvas>
       </div>
 
+    </section>
+
+    <!-- Comparaison mois précédent -->
+    <section class="card card--compare" id="compareSection" hidden aria-label="Comparaison mois précédent">
+      <h2 class="card-title">Comparaison — <span id="compareMonthLabel"></span></h2>
+      <div class="compare-grid">
+        <div class="compare-item">
+          <span class="compare-label">Total charges</span>
+          <span class="compare-prev" id="cmp-totalCharges">—</span>
+          <span class="compare-delta" id="dlt-totalCharges"></span>
+        </div>
+        <div class="compare-item">
+          <span class="compare-label">Reste à vivre</span>
+          <span class="compare-prev" id="cmp-resteAVivre">—</span>
+          <span class="compare-delta" id="dlt-resteAVivre"></span>
+        </div>
+        <div class="compare-item">
+          <span class="compare-label">Taux d'épargne</span>
+          <span class="compare-prev" id="cmp-tauxEpargne">—</span>
+          <span class="compare-delta" id="dlt-tauxEpargne"></span>
+        </div>
+        <div class="compare-item">
+          <span class="compare-label">Sous de côté</span>
+          <span class="compare-prev" id="cmp-sousDecote">—</span>
+          <span class="compare-delta" id="dlt-sousDecote"></span>
+        </div>
+      </div>
     </section>
 
   </main>
