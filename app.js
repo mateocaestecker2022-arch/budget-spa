@@ -1,7 +1,12 @@
 const STORAGE_KEY = 'budgetData';
 const HISTORY_KEY = 'budgetHistory';
+const SUBS_KEY = 'budgetSubscriptions';
+const GOAL_KEY = 'budgetGoal';
 
-const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'epargne', 'sousDecote'];
+let subs = [];
+let goal = { nom: '', montant: '' };
+
+const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'epargne', 'sousDecote', 'prime', 'primePctEpargne', 'primePctSousDecote', 'primePctReste', 'primePctDette'];
 
 const el = {
   salaire:           () => document.getElementById('salaire'),
@@ -13,6 +18,22 @@ const el = {
   autres:            () => document.getElementById('autres'),
   epargne:           () => document.getElementById('epargne'),
   sousDecote:        () => document.getElementById('sousDecote'),
+  subsList:          () => document.getElementById('subsList'),
+  subsTotal:         () => document.getElementById('subsTotal'),
+  btnAddSub:         () => document.getElementById('btnAddSub'),
+  goalNom:              () => document.getElementById('goalNom'),
+  goalMontant:          () => document.getElementById('goalMontant'),
+  goalProgressLabel:    () => document.getElementById('goalProgressLabel'),
+  goalProgressPctLabel: () => document.getElementById('goalProgressPctLabel'),
+  goalProgressFill:     () => document.getElementById('goalProgressFill'),
+  goalProgressBar:      () => document.getElementById('goalProgressBar'),
+  capaciteEpargne:      () => document.getElementById('capaciteEpargne'),
+  goalEstimation:       () => document.getElementById('goalEstimation'),
+  primePctTotal:     () => document.getElementById('primePctTotal'),
+  primeAmtEpargne:    () => document.getElementById('primeAmtEpargne'),
+  primeAmtSousDecote: () => document.getElementById('primeAmtSousDecote'),
+  primeAmtReste:      () => document.getElementById('primeAmtReste'),
+  primeAmtDette:      () => document.getElementById('primeAmtDette'),
   totalCharges:      () => document.getElementById('totalCharges'),
   resteAVivre:       () => document.getElementById('resteAVivre'),
   tauxEpargne:       () => document.getElementById('tauxEpargne'),
@@ -45,6 +66,87 @@ function val(id) {
   return Math.max(0, parseFloat(document.getElementById(id).value) || 0);
 }
 
+// ── Abonnements ──────────────────────────────────────────────────
+function loadSubs() {
+  try { return JSON.parse(localStorage.getItem(SUBS_KEY)) || []; } catch { return []; }
+}
+
+function saveSubs() {
+  localStorage.setItem(SUBS_KEY, JSON.stringify(subs));
+}
+
+function subsTotalAmount() {
+  return subs.reduce((sum, s) => sum + Math.max(0, parseFloat(s.amount) || 0), 0);
+}
+
+function renderSubs() {
+  const list = el.subsList();
+  list.innerHTML = '';
+
+  if (subs.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'subs-empty';
+    p.textContent = 'Aucun abonnement — ajoute-en un ci-dessous.';
+    list.appendChild(p);
+    return;
+  }
+
+  subs.forEach(sub => {
+    const row = document.createElement('div');
+    row.className = 'subs-row';
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'subs-name';
+    nameInput.placeholder = 'ex: Netflix';
+    nameInput.value = sub.name;
+    nameInput.setAttribute('aria-label', 'Nom de l\'abonnement');
+    nameInput.addEventListener('input', () => { sub.name = nameInput.value; saveSubs(); });
+
+    const amountInput = document.createElement('input');
+    amountInput.type = 'number';
+    amountInput.className = 'subs-amount';
+    amountInput.min = '0';
+    amountInput.step = '1';
+    amountInput.placeholder = 'ex: 15';
+    amountInput.value = sub.amount;
+    amountInput.setAttribute('aria-label', 'Montant de l\'abonnement (€)');
+    amountInput.addEventListener('input', () => { sub.amount = amountInput.value; saveSubs(); refresh(); });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'subs-remove';
+    removeBtn.setAttribute('aria-label', 'Supprimer cet abonnement');
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => {
+      subs = subs.filter(s => s.id !== sub.id);
+      saveSubs();
+      renderSubs();
+      refresh();
+    });
+
+    row.append(nameInput, amountInput, removeBtn);
+    list.appendChild(row);
+  });
+}
+
+function addSub() {
+  subs.push({ id: Date.now() + Math.random().toString(36).slice(2), name: '', amount: '' });
+  saveSubs();
+  renderSubs();
+  refresh();
+  el.subsList().querySelector('.subs-row:last-child .subs-name')?.focus();
+}
+
+// ── Objectif d'épargne ──────────────────────────────────────────
+function loadGoal() {
+  try { return JSON.parse(localStorage.getItem(GOAL_KEY)) || { nom: '', montant: '' }; } catch { return { nom: '', montant: '' }; }
+}
+
+function saveGoal() {
+  localStorage.setItem(GOAL_KEY, JSON.stringify(goal));
+}
+
 // ── Calculs ────────────────────────────────────────────────────
 function compute() {
   const salaire    = val('salaire');
@@ -56,12 +158,36 @@ function compute() {
   const autres     = val('autres');
   const epargne    = val('epargne');
   const sousDecote = val('sousDecote');
+  const abonnements = subsTotalAmount();
 
-  const totalCharges = loyer + nourriture + assurance + dette + facture + autres;
+  const prime               = val('prime');
+  const primePctEpargne     = val('primePctEpargne');
+  const primePctSousDecote  = val('primePctSousDecote');
+  const primePctReste       = val('primePctReste');
+  const primePctDette       = val('primePctDette');
+  const primePctTotal       = primePctEpargne + primePctSousDecote + primePctReste + primePctDette;
+  const primeAmtEpargne     = prime * primePctEpargne / 100;
+  const primeAmtSousDecote  = prime * primePctSousDecote / 100;
+  const primeAmtReste       = prime * primePctReste / 100;
+  const primeAmtDette       = prime * primePctDette / 100;
+
+  const totalCharges = loyer + nourriture + assurance + dette + facture + autres + abonnements;
   const resteAVivre  = salaire - totalCharges - epargne;
   const tauxEpargne  = salaire > 0 ? (epargne / salaire) * 100 : 0;
 
-  return { salaire, loyer, nourriture, assurance, dette, facture, autres, epargne, sousDecote, totalCharges, resteAVivre, tauxEpargne };
+  const goalMontant      = Math.max(0, parseFloat(goal.montant) || 0);
+  const capaciteEpargne  = salaire - totalCharges;
+  const goalProgressPct  = goalMontant > 0 ? Math.min(100, (sousDecote / goalMontant) * 100) : 0;
+  const goalRemaining    = Math.max(0, goalMontant - sousDecote);
+  const goalMonthsLeft   = capaciteEpargne > 0 ? Math.ceil(goalRemaining / capaciteEpargne) : null;
+
+  return {
+    salaire, loyer, nourriture, assurance, dette, facture, autres, epargne, sousDecote, abonnements,
+    totalCharges, resteAVivre, tauxEpargne,
+    prime, primePctEpargne, primePctSousDecote, primePctReste, primePctDette,
+    primePctTotal, primeAmtEpargne, primeAmtSousDecote, primeAmtReste, primeAmtDette,
+    goalMontant, capaciteEpargne, goalProgressPct, goalRemaining, goalMonthsLeft,
+  };
 }
 
 // ── Mise à jour DOM ────────────────────────────────────────────
@@ -83,16 +209,54 @@ function updateDOM(data) {
   el.progressLabel().textContent = fmt(epargne) + ' / ' + fmt(salaire);
 
   el.sousDecoteDisplay().textContent = fmt(sousDecote);
+  el.subsTotal().textContent = fmt(data.abonnements);
+}
+
+// ── Mise à jour répartition prime ──────────────────────────────
+function updatePrime(data) {
+  const { prime, primePctTotal, primeAmtEpargne, primeAmtSousDecote, primeAmtReste, primeAmtDette } = data;
+
+  const totalEl = el.primePctTotal();
+  totalEl.textContent = `Répartition totale : ${primePctTotal} %`;
+  totalEl.classList.toggle('warning', prime > 0 && primePctTotal !== 100);
+
+  el.primeAmtEpargne().textContent = fmt(primeAmtEpargne);
+  el.primeAmtSousDecote().textContent = fmt(primeAmtSousDecote);
+  el.primeAmtReste().textContent = fmt(primeAmtReste);
+  el.primeAmtDette().textContent = fmt(primeAmtDette);
+}
+
+// ── Mise à jour objectif d'épargne ──────────────────────────────
+function updateGoal(data) {
+  const { sousDecote, goalMontant, capaciteEpargne, goalProgressPct, goalMonthsLeft } = data;
+
+  el.capaciteEpargne().textContent = fmt(capaciteEpargne);
+
+  el.goalProgressLabel().textContent = `${fmt(sousDecote)} / ${fmt(goalMontant)}`;
+  el.goalProgressPctLabel().textContent = Math.round(goalProgressPct) + ' %';
+  el.goalProgressFill().style.width = goalProgressPct + '%';
+  el.goalProgressBar().setAttribute('aria-valuenow', Math.round(goalProgressPct));
+
+  const estEl = el.goalEstimation();
+  if (goalMontant <= 0) {
+    estEl.textContent = 'Définis un montant cible';
+  } else if (sousDecote >= goalMontant) {
+    estEl.textContent = 'Objectif atteint !';
+  } else if (goalMonthsLeft === null) {
+    estEl.textContent = 'Pas d\'estimation possible';
+  } else {
+    estEl.textContent = `Encore ${goalMonthsLeft} mois à ce rythme`;
+  }
 }
 
 // ── Graphique Chart.js ─────────────────────────────────────────
 function updateChart(data) {
-  const { loyer, nourriture, assurance, dette, facture, autres, epargne, resteAVivre } = data;
+  const { loyer, nourriture, assurance, dette, facture, autres, abonnements, epargne, resteAVivre } = data;
 
   const restePositif = Math.max(0, resteAVivre);
-  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Factures', 'Autres', 'Épargne', 'Reste à vivre'];
-  const values = [loyer, nourriture, assurance, dette, facture, autres, epargne, restePositif];
-  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e', '#06b6d4', '#a3e635'];
+  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Factures', 'Autres', 'Abonnements', 'Épargne', 'Reste à vivre'];
+  const values = [loyer, nourriture, assurance, dette, facture, autres, abonnements, epargne, restePositif];
+  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e', '#0ea5e9', '#06b6d4', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;
@@ -229,6 +393,8 @@ function reset() {
 function refresh() {
   const data = compute();
   updateDOM(data);
+  updatePrime(data);
+  updateGoal(data);
   updateChart(data);
   updateCompare(data);
   save(data);
@@ -243,6 +409,15 @@ function fmt(n) {
 document.addEventListener('DOMContentLoaded', () => {
   el.headerMonth().textContent = monthLabel(currentMonthKey());
 
+  subs = loadSubs();
+  renderSubs();
+
+  goal = loadGoal();
+  el.goalNom().value = goal.nom || '';
+  el.goalMontant().value = goal.montant || '';
+  el.goalNom().addEventListener('input', () => { goal.nom = el.goalNom().value; saveGoal(); });
+  el.goalMontant().addEventListener('input', () => { goal.montant = el.goalMontant().value; saveGoal(); refresh(); });
+
   archiveAndReset();
   restore();
   refresh();
@@ -251,4 +426,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById(id).addEventListener('input', refresh);
   });
   el.btnReset().addEventListener('click', reset);
+  el.btnAddSub().addEventListener('click', addSub);
 });

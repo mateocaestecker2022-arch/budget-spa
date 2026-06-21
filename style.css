@@ -213,6 +213,134 @@ body {
   margin-top: .5rem;
 }
 
+/* ── Objectif d'épargne ────────────────────────────────────── */
+.card--goal {
+  grid-column: span 2;
+}
+
+.goal-inputs-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: .75rem;
+}
+
+.goal-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+}
+
+/* ── Abonnements ───────────────────────────────────────────── */
+.card--subs {
+  grid-column: span 2;
+}
+
+.subs-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.subs-empty {
+  font-size: .85rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.subs-row {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.subs-row input {
+  padding: .6rem .85rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  font-size: .95rem;
+  color: var(--color-text);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s;
+}
+
+.subs-row input:focus {
+  border-color: var(--color-input-focus);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+}
+
+.subs-name { flex: 1; }
+.subs-amount { width: 100px; flex: none; }
+
+.subs-remove {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.subs-remove:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-add-sub {
+  align-self: flex-start;
+  padding: .5rem 1rem;
+  background: var(--color-primary-light);
+  border: none;
+  border-radius: 8px;
+  color: var(--color-primary);
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.btn-add-sub:hover { background: #ddd6fe; }
+
+.subs-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: .5rem;
+  border-top: 1.5px solid var(--color-border);
+  font-weight: 600;
+}
+
+/* ── Prime ─────────────────────────────────────────────────── */
+.card--prime {
+  grid-column: span 2;
+}
+
+.prime-split-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .75rem;
+}
+
+.prime-pct-total {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.prime-pct-total.warning { color: var(--color-danger); }
+
+.prime-results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .75rem;
+}
+
 /* ── Comparaison mois précédent ────────────────────────────── */
 .card--compare {
   grid-column: span 2;
@@ -296,6 +424,22 @@ body {
   /* Comparaison */
   .card--compare { grid-column: span 1; }
   .compare-grid  { grid-template-columns: 1fr 1fr; }
+
+  /* Prime */
+  .card--prime        { grid-column: span 1; }
+  .prime-split-grid   { grid-template-columns: 1fr 1fr; }
+  .prime-results-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Objectif d'épargne */
+  .card--goal       { grid-column: span 1; }
+  .goal-inputs-grid { grid-template-columns: 1fr; }
+
+  /* Abonnements */
+  .card--subs { grid-column: span 1; }
+  .subs-row input { padding: .85rem 1rem; font-size: 1rem; min-height: 48px; }
+  .subs-amount { width: 80px; }
+  .subs-remove { width: 44px; height: 44px; font-size: 1.3rem; }
+  .btn-add-sub { width: 100%; text-align: center; padding: .85rem; font-size: .95rem; }
 
   /* Bouton reset */
   .btn-reset {

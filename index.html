@@ -120,6 +120,109 @@
 
     </section>
 
+    <!-- Objectif d'épargne -->
+    <section class="card card--goal" id="goalSection" aria-label="Objectif d'épargne">
+      <h2 class="card-title">Objectif d'épargne</h2>
+
+      <div class="goal-inputs-grid">
+        <div class="form-group">
+          <label for="goalNom">Nom de l'objectif</label>
+          <input type="text" id="goalNom" placeholder="ex: Voyage au Japon" />
+        </div>
+        <div class="form-group">
+          <label for="goalMontant">Montant cible (€)</label>
+          <input type="number" id="goalMontant" min="0" step="1" placeholder="ex: 10000" />
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-header">
+          <span id="goalProgressLabel">0 € / 0 €</span>
+          <span id="goalProgressPctLabel">0 %</span>
+        </div>
+        <div class="progress-bar" id="goalProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="goalProgressFill"></div>
+        </div>
+      </div>
+
+      <div class="goal-results-grid">
+        <div class="result-item">
+          <span class="result-label">Capacité d'épargne ce mois</span>
+          <span class="result-value" id="capaciteEpargne">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Estimation</span>
+          <span class="result-value" id="goalEstimation">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Abonnements -->
+    <section class="card card--subs" id="subsSection" aria-label="Abonnements">
+      <h2 class="card-title">Abonnements</h2>
+
+      <div class="subs-list" id="subsList"></div>
+
+      <button class="btn-add-sub" id="btnAddSub" type="button">+ Ajouter un abonnement</button>
+
+      <div class="subs-total-row">
+        <span class="result-label">Total abonnements</span>
+        <span class="result-value" id="subsTotal">0 €</span>
+      </div>
+    </section>
+
+    <!-- Prime -->
+    <section class="card card--prime" id="primeSection" aria-label="Prime">
+      <h2 class="card-title">Prime</h2>
+
+      <div class="form-group">
+        <label for="prime">Montant de la prime (€)</label>
+        <input type="number" id="prime" min="0" step="1" placeholder="ex: 500" />
+      </div>
+
+      <h3 class="section-label">Répartition (%)</h3>
+
+      <div class="prime-split-grid">
+        <div class="form-group">
+          <label for="primePctEpargne">Épargne</label>
+          <input type="number" id="primePctEpargne" min="0" max="100" step="1" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label for="primePctSousDecote">Sous de côté</label>
+          <input type="number" id="primePctSousDecote" min="0" max="100" step="1" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label for="primePctReste">Reste à vivre</label>
+          <input type="number" id="primePctReste" min="0" max="100" step="1" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label for="primePctDette">Dette</label>
+          <input type="number" id="primePctDette" min="0" max="100" step="1" placeholder="0" />
+        </div>
+      </div>
+
+      <p class="prime-pct-total" id="primePctTotal">Répartition totale : 0 %</p>
+
+      <div class="prime-results-grid">
+        <div class="result-item">
+          <span class="result-label">→ Épargne</span>
+          <span class="result-value" id="primeAmtEpargne">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">→ Sous de côté</span>
+          <span class="result-value" id="primeAmtSousDecote">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">→ Reste à vivre</span>
+          <span class="result-value" id="primeAmtReste">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">→ Dette</span>
+          <span class="result-value" id="primeAmtDette">0 €</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Comparaison mois précédent -->
     <section class="card card--compare" id="compareSection" hidden aria-label="Comparaison mois précédent">
       <h2 class="card-title">Comparaison — <span id="compareMonthLabel"></span></h2>
