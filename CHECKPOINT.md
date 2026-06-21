@@ -15,6 +15,14 @@
 - [x] Phase 3 — Graphiques Chart.js + sessionStorage (intégré Phase 2)
 - [x] Phase 4 — Tests et recette Playwright — PASS
 
+### 2026-06-21 — Prime, Abonnements, Objectif d'épargne
+- [x] Prime : montant ponctuel réparti en % entre Épargne / Sous de côté / Reste à vivre / Dette, avec avertissement si répartition ≠ 100 %
+- [x] Abonnements : liste dynamique (nom + montant, ajout/suppression), total intégré au calcul de Total charges et au graphique
+- [x] Objectif d'épargne long terme : nom + montant cible, barre de progression (Sous de côté ÷ cible), estimation du temps restant via la nouvelle métrique "Capacité d'épargne" (Salaire − Total charges)
+- [x] Persistance localStorage indépendante du reset mensuel pour Abonnements et Objectif d'épargne (comme Sous de côté)
+- [x] Tests Playwright end-to-end en local — PASS (calculs croisés, alerte, reset, reload)
+- [x] Déploiement GitHub Pages + tests Playwright end-to-end rejoués sur le site en ligne — PASS, aucune erreur console
+
 ---
 
 ## Phases
@@ -31,6 +39,10 @@
 | + | Comparaison mois précédent | ✅ Terminé |
 | + | Optimisation mobile | ✅ Terminé |
 | + | Déploiement GitHub Pages | ✅ Terminé |
+| + | Prime (répartition % par destination) | ✅ Terminé |
+| + | Abonnements (liste dynamique) | ✅ Terminé |
+| + | Objectif d'épargne long terme + estimation | ✅ Terminé |
+| + | Vérification end-to-end sur le site en ligne | ✅ PASS |
 
 ---
 
@@ -56,6 +68,22 @@
 | Reset mensuel auto + report sous de côté | ✅ |
 | Section comparaison mois précédent | ✅ |
 | Mobile — inputs touch, bouton pleine largeur | ✅ |
+| Aucune erreur console | ✅ |
+
+## Résultats recette — Prime / Abonnements / Objectif d'épargne (2026-06-21)
+
+| Test | Résultat |
+|------|----------|
+| Total charges inclut les abonnements | ✅ |
+| Capacité d'épargne = Salaire − Total charges | ✅ |
+| Répartition prime 100 % → pas d'avertissement | ✅ |
+| Répartition prime ≠ 100 % → avertissement visible | ✅ |
+| Estimation objectif (mois restants) | ✅ |
+| Graphique Chart.js — 9 catégories dont Abonnements | ✅ |
+| Alerte solde négatif toujours fonctionnelle | ✅ |
+| Reset mensuel : Abonnements + Objectif persistent | ✅ |
+| Persistance localStorage après reload | ✅ |
+| Rejoué à l'identique sur le site en ligne | ✅ |
 | Aucune erreur console | ✅ |
 
 ## Évolutions futures (hors v1.0)
