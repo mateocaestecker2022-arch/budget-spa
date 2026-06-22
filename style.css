@@ -425,6 +425,41 @@ body {
 
 .btn-apply-dispatch:hover { background: #ddd6fe; }
 
+/* ── Conseils ──────────────────────────────────────────────── */
+.card--conseils {
+  grid-column: span 2;
+}
+
+.conseils-list {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  list-style: none;
+}
+
+.conseil-item {
+  padding: .75rem 1rem;
+  border-radius: 8px;
+  font-size: .88rem;
+  line-height: 1.4;
+  border-left: 4px solid transparent;
+}
+
+.conseil-item--warning {
+  background: var(--color-danger-light);
+  border-left-color: var(--color-danger);
+}
+
+.conseil-item--info {
+  background: var(--color-primary-light);
+  border-left-color: var(--color-primary);
+}
+
+.conseil-item--success {
+  background: #ecfdf5;
+  border-left-color: var(--color-success);
+}
+
 /* ── Comparaison mois précédent ────────────────────────────── */
 .card--compare {
   grid-column: span 2;
@@ -533,6 +568,9 @@ body {
   /* Répartition du reste à vivre */
   .card--dispatch { grid-column: span 1; }
   .btn-apply-dispatch { width: 100%; text-align: center; padding: .85rem; font-size: .95rem; }
+
+  /* Conseils */
+  .card--conseils { grid-column: span 1; }
 
   /* Bouton reset */
   .btn-reset {

@@ -48,6 +48,7 @@ const el = {
   headerMonth:       () => document.getElementById('headerMonth'),
   compareSection:    () => document.getElementById('compareSection'),
   compareMonthLabel: () => document.getElementById('compareMonthLabel'),
+  conseilsList:      () => document.getElementById('conseilsList'),
 };
 
 let chart = null;
@@ -345,6 +346,60 @@ function updateChart(data) {
   });
 }
 
+// ── Conseils ─────────────────────────────────────────────────────
+function computeConseils(data) {
+  const { salaire, loyer, totalCharges, sousDecote, detteRestante, dette, abonnements, capaciteEpargne, dispatchPctTotal, goalMontant } = data;
+  const conseils = [];
+
+  if (salaire > 0 && loyer > salaire * 0.33) {
+    conseils.push({ type: 'warning', text: `Ton loyer représente ${Math.round(loyer / salaire * 100)} % de ton salaire — la recommandation est de rester sous 33 %.` });
+  }
+
+  if (totalCharges > 0 && sousDecote < totalCharges * 3) {
+    conseils.push({ type: 'warning', text: `Ton matelas de sécurité (Sous de côté : ${fmt(sousDecote)}) couvre moins de 3 mois de charges (${fmt(totalCharges * 3)}) — vise au moins ce montant.` });
+  }
+
+  if (detteRestante > 0) {
+    if (dette > 0) {
+      const moisRestants = Math.ceil(detteRestante / dette);
+      if (moisRestants > 24) {
+        conseils.push({ type: 'warning', text: `Au rythme actuel (${fmt(dette)}/mois), il te faudra encore ${moisRestants} mois pour rembourser ta dette — augmente le remboursement mensuel ou fais un remboursement ponctuel.` });
+      }
+    } else {
+      conseils.push({ type: 'warning', text: `Tu as une dette restante de ${fmt(detteRestante)} mais aucun remboursement mensuel défini.` });
+    }
+  }
+
+  if (salaire > 0 && abonnements > salaire * 0.1) {
+    conseils.push({ type: 'info', text: `Tes abonnements représentent ${fmt(abonnements)}/mois (${Math.round(abonnements / salaire * 100)} % du salaire) — vérifie si tu utilises tout.` });
+  }
+
+  if (capaciteEpargne > 0 && dispatchPctTotal === 0) {
+    conseils.push({ type: 'info', text: `Tu as une capacité d'épargne de ${fmt(capaciteEpargne)} ce mois — pense à la répartir vers Sous de côté / Dette dans "Répartition du reste à vivre".` });
+  }
+
+  if (goalMontant <= 0 && capaciteEpargne > 0) {
+    conseils.push({ type: 'info', text: `Tu as une capacité d'épargne positive mais aucun objectif d'épargne défini — pense à en créer un.` });
+  }
+
+  if (conseils.length === 0) {
+    conseils.push({ type: 'success', text: 'Ton budget est équilibré, continue comme ça !' });
+  }
+
+  return conseils;
+}
+
+function updateConseils(data) {
+  const list = el.conseilsList();
+  list.innerHTML = '';
+  computeConseils(data).forEach(({ type, text }) => {
+    const li = document.createElement('li');
+    li.className = `conseil-item conseil-item--${type}`;
+    li.textContent = text;
+    list.appendChild(li);
+  });
+}
+
 // ── Comparaison mois précédent ─────────────────────────────────
 function updateCompare(current) {
   const history = loadHistory();
@@ -454,6 +509,7 @@ function refresh() {
   updateDispatch(data);
   updateChart(data);
   updateCompare(data);
+  updateConseils(data);
   save(data);
 }
 

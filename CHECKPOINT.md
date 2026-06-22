@@ -42,6 +42,8 @@
 - [x] **Bug fix mobile — "CSS grid blowout"** : les cartes (`.card`) et `.form-group` n'avaient pas `min-width: 0`, ce qui empêchait les grilles imbriquées (Prime, Dispatch, etc.) de rétrécir correctement sur petit écran → débordement horizontal sur mobile. Corrigé en ajoutant `min-width: 0` sur `.card` et `.form-group` ; retiré aussi un `white-space: nowrap` inutile sur `.btn-apply-debt`
 - [x] **Bouton "Appliquer" ajouté sur Prime** (comme Dette et Répartition du reste à vivre) : Épargne + Sous de côté de la prime s'ajoutent ensemble à Sous de côté, Dette se soustrait de Dette restante, Reste à vivre ne touche aucun compteur. Tous les champs Prime se vident après application
 - [x] Tests Playwright en local — PASS (zéro élément en débordement sur mobile et desktop, apply Prime calculé et persisté correctement après reload, aucune erreur console)
+- [x] **Nouvelle section "Conseils"** : liste de suggestions basées sur des règles calculées à partir des données saisies — loyer > 33% du salaire, Sous de côté < 3 mois de charges, dette restante sans remboursement mensuel ou remboursement > 24 mois, abonnements > 10% du salaire, capacité d'épargne non répartie ce mois, aucun objectif d'épargne défini ; message positif si rien ne se déclenche
+- [x] Tests Playwright en local — PASS (chaque règle déclenchée et vérifiée individuellement, cas équilibré → message succès, aucun débordement mobile, aucune erreur console)
 
 ---
 
