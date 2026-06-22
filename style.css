@@ -17,6 +17,7 @@
 
 /* ── Reset ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -31,11 +32,39 @@ body {
   background: var(--color-primary);
   color: #fff;
   padding: 1.5rem 2rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
+.header-content { text-align: center; flex: 1; }
 .header h1 { font-size: 1.6rem; font-weight: 700; }
 .header-sub { font-size: .9rem; opacity: .85; margin-top: .25rem; }
+
+.header-user { display: flex; align-items: center; gap: .75rem; flex-shrink: 0; }
+.header-user[hidden] { display: none; }
+.header-user-email {
+  font-size: .82rem;
+  opacity: .85;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-logout {
+  padding: .35rem .85rem;
+  background: rgba(255,255,255,.15);
+  border: 1.5px solid rgba(255,255,255,.35);
+  border-radius: 8px;
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s;
+}
+.btn-logout:hover { background: rgba(255,255,255,.28); }
 
 /* ── Grid principal ────────────────────────────────────────── */
 .main-grid {
@@ -504,6 +533,93 @@ body {
 .delta--up   { color: var(--color-danger); }
 .delta--down { color: var(--color-success); }
 
+/* ── Auth overlay ──────────────────────────────────────────── */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.auth-overlay[hidden] { display: none; }
+
+.auth-loading {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+.auth-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.auth-card[hidden] { display: none; }
+
+.auth-logo h2 { font-size: 1.3rem; font-weight: 700; color: var(--color-primary); }
+.auth-logo p  { font-size: .85rem; color: var(--color-text-muted); margin-top: .3rem; }
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: .6rem;
+  border: none;
+  background: none;
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color .15s;
+}
+
+.auth-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 700;
+}
+
+#authError {
+  font-size: .82rem;
+  padding: .6rem .85rem;
+  border-radius: 8px;
+  margin: 0;
+}
+
+#authError.is-error   { color: var(--color-danger);  background: var(--color-danger-light); }
+#authError.is-success { color: var(--color-success); background: #ecfdf5; }
+#authError[hidden]    { display: none; }
+
+.btn-auth {
+  padding: .75rem 1.5rem;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+.btn-auth:hover    { opacity: .9; }
+.btn-auth:disabled { opacity: .6; cursor: not-allowed; }
+
 /* ── Responsive mobile ─────────────────────────────────────── */
 @media (max-width: 768px) {
   .main-grid {
@@ -514,9 +630,12 @@ body {
   }
 
   /* Header */
-  .header { padding: 1.25rem 1rem; }
+  .header { padding: 1.25rem 1rem; flex-wrap: wrap; }
+  .header-content { flex: 1 1 100%; }
   .header h1 { font-size: 1.25rem; }
   .header-sub { font-size: .85rem; }
+  .header-user { justify-content: center; }
+  .header-user-email { font-size: .75rem; }
 
   /* Carte */
   .card { padding: 1.25rem; gap: .75rem; }

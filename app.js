@@ -1,7 +1,13 @@
 const STORAGE_KEY = 'budgetData';
 const HISTORY_KEY = 'budgetHistory';
-const SUBS_KEY = 'budgetSubscriptions';
-const GOAL_KEY = 'budgetGoal';
+const SUBS_KEY    = 'budgetSubscriptions';
+const GOAL_KEY    = 'budgetGoal';
+
+// ── Supabase ────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://pgocmfqnatzsxyihkjra.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ps_okVLusVNEmopxXA8s1A_DUFutwlH';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser = null;
 
 let subs = [];
 let goal = { nom: '', montant: '' };
@@ -9,14 +15,14 @@ let goal = { nom: '', montant: '' };
 const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
 
 const el = {
-  salaire:           () => document.getElementById('salaire'),
-  loyer:             () => document.getElementById('loyer'),
-  nourriture:        () => document.getElementById('nourriture'),
-  assurance:         () => document.getElementById('assurance'),
-  dette:             () => document.getElementById('dette'),
-  facture:           () => document.getElementById('facture'),
-  autres:            () => document.getElementById('autres'),
-  sousDecote:        () => document.getElementById('sousDecote'),
+  salaire:              () => document.getElementById('salaire'),
+  loyer:                () => document.getElementById('loyer'),
+  nourriture:           () => document.getElementById('nourriture'),
+  assurance:            () => document.getElementById('assurance'),
+  dette:                () => document.getElementById('dette'),
+  facture:              () => document.getElementById('facture'),
+  autres:               () => document.getElementById('autres'),
+  sousDecote:           () => document.getElementById('sousDecote'),
   detteRestante:        () => document.getElementById('detteRestante'),
   detteRemboursementExtra: () => document.getElementById('detteRemboursementExtra'),
   detteRestanteDisplay: () => document.getElementById('detteRestanteDisplay'),
@@ -25,11 +31,11 @@ const el = {
   dispatchReste:        () => document.getElementById('dispatchReste'),
   dispatchPctTotal:     () => document.getElementById('dispatchPctTotal'),
   dispatchAmtSousDecote: () => document.getElementById('dispatchAmtSousDecote'),
-  dispatchAmtDette:      () => document.getElementById('dispatchAmtDette'),
-  btnAppliquerDispatch:  () => document.getElementById('btnAppliquerDispatch'),
-  subsList:          () => document.getElementById('subsList'),
-  subsTotal:         () => document.getElementById('subsTotal'),
-  btnAddSub:         () => document.getElementById('btnAddSub'),
+  dispatchAmtDette:     () => document.getElementById('dispatchAmtDette'),
+  btnAppliquerDispatch: () => document.getElementById('btnAppliquerDispatch'),
+  subsList:             () => document.getElementById('subsList'),
+  subsTotal:            () => document.getElementById('subsTotal'),
+  btnAddSub:            () => document.getElementById('btnAddSub'),
   goalNom:              () => document.getElementById('goalNom'),
   goalMontant:          () => document.getElementById('goalMontant'),
   goalProgressLabel:    () => document.getElementById('goalProgressLabel'),
@@ -38,17 +44,17 @@ const el = {
   goalProgressBar:      () => document.getElementById('goalProgressBar'),
   capaciteEpargne:      () => document.getElementById('capaciteEpargne'),
   goalEstimation:       () => document.getElementById('goalEstimation'),
-  primeMontantTotal: () => document.getElementById('primeMontantTotal'),
-  btnAppliquerPrime: () => document.getElementById('btnAppliquerPrime'),
-  totalCharges:      () => document.getElementById('totalCharges'),
-  resteAVivre:       () => document.getElementById('resteAVivre'),
-  alert:             () => document.getElementById('alert'),
-  sousDecoteDisplay: () => document.getElementById('sousDecoteDisplay'),
-  btnReset:          () => document.getElementById('btnReset'),
-  headerMonth:       () => document.getElementById('headerMonth'),
-  compareSection:    () => document.getElementById('compareSection'),
-  compareMonthLabel: () => document.getElementById('compareMonthLabel'),
-  conseilsList:      () => document.getElementById('conseilsList'),
+  primeMontantTotal:    () => document.getElementById('primeMontantTotal'),
+  btnAppliquerPrime:    () => document.getElementById('btnAppliquerPrime'),
+  totalCharges:         () => document.getElementById('totalCharges'),
+  resteAVivre:          () => document.getElementById('resteAVivre'),
+  alert:                () => document.getElementById('alert'),
+  sousDecoteDisplay:    () => document.getElementById('sousDecoteDisplay'),
+  btnReset:             () => document.getElementById('btnReset'),
+  headerMonth:          () => document.getElementById('headerMonth'),
+  compareSection:       () => document.getElementById('compareSection'),
+  compareMonthLabel:    () => document.getElementById('compareMonthLabel'),
+  conseilsList:         () => document.getElementById('conseilsList'),
 };
 
 let chart = null;
@@ -76,6 +82,7 @@ function loadSubs() {
 
 function saveSubs() {
   localStorage.setItem(SUBS_KEY, JSON.stringify(subs));
+  syncToCloud(SUBS_KEY, subs);
 }
 
 function subsTotalAmount() {
@@ -148,6 +155,7 @@ function loadGoal() {
 
 function saveGoal() {
   localStorage.setItem(GOAL_KEY, JSON.stringify(goal));
+  syncToCloud(GOAL_KEY, goal);
 }
 
 // ── Calculs ────────────────────────────────────────────────────
@@ -180,11 +188,11 @@ function compute() {
   const dispatchAmtSousDecote = dispatchBase * dispatchPctSousDecote / 100;
   const dispatchAmtDette      = dispatchBase * dispatchPctDette / 100;
 
-  const goalMontant      = Math.max(0, parseFloat(goal.montant) || 0);
-  const capaciteEpargne  = salaire - totalCharges;
-  const goalProgressPct  = goalMontant > 0 ? Math.min(100, (sousDecote / goalMontant) * 100) : 0;
-  const goalRemaining    = Math.max(0, goalMontant - sousDecote);
-  const goalMonthsLeft   = capaciteEpargne > 0 ? Math.ceil(goalRemaining / capaciteEpargne) : null;
+  const goalMontant     = Math.max(0, parseFloat(goal.montant) || 0);
+  const capaciteEpargne = salaire - totalCharges;
+  const goalProgressPct = goalMontant > 0 ? Math.min(100, (sousDecote / goalMontant) * 100) : 0;
+  const goalRemaining   = Math.max(0, goalMontant - sousDecote);
+  const goalMonthsLeft  = capaciteEpargne > 0 ? Math.ceil(goalRemaining / capaciteEpargne) : null;
 
   return {
     salaire, loyer, nourriture, assurance, dette, facture, autres, sousDecote, detteRestante, abonnements,
@@ -207,8 +215,8 @@ function updateDOM(data) {
 
   el.alert().hidden = resteAVivre >= 0;
 
-  el.sousDecoteDisplay().textContent = fmt(sousDecote);
-  el.subsTotal().textContent = fmt(data.abonnements);
+  el.sousDecoteDisplay().textContent    = fmt(sousDecote);
+  el.subsTotal().textContent            = fmt(data.abonnements);
   el.detteRestanteDisplay().textContent = fmt(data.detteRestante);
 }
 
@@ -227,14 +235,14 @@ function updateDispatch(data) {
   const { totalCharges, dispatchBase, dispatchPctTotal, dispatchAmtSousDecote, dispatchAmtDette } = data;
 
   el.dispatchTotalCharges().textContent = fmt(totalCharges);
-  el.dispatchReste().textContent = fmt(dispatchBase);
+  el.dispatchReste().textContent        = fmt(dispatchBase);
 
   const totalEl = el.dispatchPctTotal();
   totalEl.textContent = `Répartition totale : ${dispatchPctTotal} %`;
   totalEl.classList.toggle('warning', dispatchBase > 0 && dispatchPctTotal !== 100);
 
   el.dispatchAmtSousDecote().textContent = fmt(dispatchAmtSousDecote);
-  el.dispatchAmtDette().textContent = fmt(dispatchAmtDette);
+  el.dispatchAmtDette().textContent      = fmt(dispatchAmtDette);
 }
 
 function applyDispatch() {
@@ -251,10 +259,9 @@ function applyDispatch() {
   refresh();
 }
 
-// ── Mise à jour répartition prime ──────────────────────────────
+// ── Répartition prime ──────────────────────────────────────────
 function updatePrime(data) {
   const { prime, primeMontantTotal } = data;
-
   const totalEl = el.primeMontantTotal();
   totalEl.textContent = `Réparti : ${fmt(primeMontantTotal)} / ${fmt(prime)}`;
   totalEl.classList.toggle('warning', prime > 0 && primeMontantTotal !== prime);
@@ -279,15 +286,14 @@ function applyPrime() {
   refresh();
 }
 
-// ── Mise à jour objectif d'épargne ──────────────────────────────
+// ── Objectif d'épargne ──────────────────────────────────────────
 function updateGoal(data) {
   const { sousDecote, goalMontant, capaciteEpargne, goalProgressPct, goalMonthsLeft } = data;
 
   el.capaciteEpargne().textContent = fmt(capaciteEpargne);
-
-  el.goalProgressLabel().textContent = `${fmt(sousDecote)} / ${fmt(goalMontant)}`;
+  el.goalProgressLabel().textContent    = `${fmt(sousDecote)} / ${fmt(goalMontant)}`;
   el.goalProgressPctLabel().textContent = Math.round(goalProgressPct) + ' %';
-  el.goalProgressFill().style.width = goalProgressPct + '%';
+  el.goalProgressFill().style.width     = goalProgressPct + '%';
   el.goalProgressBar().setAttribute('aria-valuenow', Math.round(goalProgressPct));
 
   const estEl = el.goalEstimation();
@@ -440,6 +446,7 @@ function loadHistory() {
 
 function saveHistory(history) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  syncToCloud(HISTORY_KEY, history);
 }
 
 function save(computed) {
@@ -447,6 +454,7 @@ function save(computed) {
   ids.forEach(id => { fields[id] = document.getElementById(id).value; });
   const entry = { month: currentMonthKey(), fields, ...computed };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
+  syncToCloud(STORAGE_KEY, entry);
 }
 
 function archiveAndReset() {
@@ -456,10 +464,9 @@ function archiveAndReset() {
     const stored = JSON.parse(raw);
     if (!stored.month || stored.month === currentMonthKey()) return;
 
-    const sousDecoteReportee = stored.sousDecote ?? 0;
+    const sousDecoteReportee    = stored.sousDecote    ?? 0;
     const detteRestanteReportee = stored.detteRestante ?? 0;
 
-    // Archiver le mois passé
     const history = loadHistory();
     history[stored.month] = {
       totalCharges:  stored.totalCharges  ?? 0,
@@ -469,11 +476,9 @@ function archiveAndReset() {
     };
     saveHistory(history);
 
-    // Reporter le sous de côté et la dette restante (soldes cumulés)
     localStorage.removeItem(STORAGE_KEY);
-    document.getElementById('sousDecote').value = sousDecoteReportee || '';
+    document.getElementById('sousDecote').value    = sousDecoteReportee    || '';
     document.getElementById('detteRestante').value = detteRestanteReportee || '';
-
   } catch {}
 }
 
@@ -491,10 +496,10 @@ function restore() {
 
 // ── Réinitialisation du mois ───────────────────────────────────
 function reset() {
-  const sousDecote = val('sousDecote');
+  const sousDecote    = val('sousDecote');
   const detteRestante = val('detteRestante');
   ids.forEach(id => { document.getElementById(id).value = ''; });
-  document.getElementById('sousDecote').value = sousDecote || '';
+  document.getElementById('sousDecote').value    = sousDecote    || '';
   document.getElementById('detteRestante').value = detteRestante || '';
   localStorage.removeItem(STORAGE_KEY);
   refresh();
@@ -518,29 +523,171 @@ function fmt(n) {
   return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 }
 
-// ── Init ───────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+// ── Auth ────────────────────────────────────────────────────────
+let authMode = 'login';
+
+function showApp() {
+  document.getElementById('authOverlay').hidden = true;
+  document.getElementById('mainContent').hidden = false;
+}
+
+function showAuth() {
+  document.getElementById('mainContent').hidden = true;
+  document.getElementById('authOverlay').hidden = false;
+  document.getElementById('authLoading').hidden = true;
+  document.getElementById('authCard').hidden    = false;
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+  document.getElementById('btnAuth').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
+  document.getElementById('authError').hidden = true;
+}
+
+function showAuthMsg(msg, isError = true) {
+  const errEl = document.getElementById('authError');
+  errEl.textContent = msg;
+  errEl.className   = isError ? 'is-error' : 'is-success';
+  errEl.hidden      = false;
+}
+
+function translateAuthError(msg) {
+  if (msg.includes('Invalid login credentials'))   return 'Email ou mot de passe incorrect.';
+  if (msg.includes('Email not confirmed'))         return 'Confirme ton email avant de te connecter.';
+  if (msg.includes('User already registered'))     return 'Ce compte existe déjà — connecte-toi à la place.';
+  if (msg.includes('Password should be at least')) return 'Le mot de passe doit faire au moins 6 caractères.';
+  return msg;
+}
+
+async function handleAuth() {
+  const email    = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const btn      = document.getElementById('btnAuth');
+
+  if (!email || !password) { showAuthMsg('Email et mot de passe requis.'); return; }
+
+  btn.disabled    = true;
+  btn.textContent = authMode === 'login' ? 'Connexion…' : 'Création…';
+  document.getElementById('authError').hidden = true;
+
+  const { data, error } = authMode === 'login'
+    ? await _sb.auth.signInWithPassword({ email, password })
+    : await _sb.auth.signUp({ email, password });
+
+  btn.disabled    = false;
+  btn.textContent = authMode === 'login' ? 'Se connecter' : 'Créer un compte';
+
+  if (error) { showAuthMsg(translateAuthError(error.message)); return; }
+
+  if (authMode === 'signup' && !data.session) {
+    showAuthMsg('Compte créé ! Vérifie ta boîte mail pour confirmer ton inscription.', false);
+  }
+}
+
+// ── Cloud sync ──────────────────────────────────────────────────
+async function syncToCloud(key, value) {
+  if (!currentUser) return;
+  try {
+    await _sb.from('budget_data').upsert(
+      { user_id: currentUser.id, key, value, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,key' }
+    );
+  } catch {}
+}
+
+async function loadFromCloud() {
+  if (!currentUser) return;
+  try {
+    const { data } = await _sb
+      .from('budget_data')
+      .select('key, value')
+      .eq('user_id', currentUser.id);
+
+    if (!data || data.length === 0) {
+      await migrateLocalToCloud();
+      return;
+    }
+    data.forEach(({ key, value }) => {
+      localStorage.setItem(key, JSON.stringify(value));
+    });
+  } catch {}
+}
+
+async function migrateLocalToCloud() {
+  for (const key of [STORAGE_KEY, HISTORY_KEY, SUBS_KEY, GOAL_KEY]) {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      try { await syncToCloud(key, JSON.parse(raw)); } catch {}
+    }
+  }
+}
+
+// ── Init données app ───────────────────────────────────────────
+function initAppData() {
   el.headerMonth().textContent = monthLabel(currentMonthKey());
 
   subs = loadSubs();
   renderSubs();
 
   goal = loadGoal();
-  el.goalNom().value = goal.nom || '';
+  el.goalNom().value     = goal.nom     || '';
   el.goalMontant().value = goal.montant || '';
-  el.goalNom().addEventListener('input', () => { goal.nom = el.goalNom().value; saveGoal(); });
-  el.goalMontant().addEventListener('input', () => { goal.montant = el.goalMontant().value; saveGoal(); refresh(); });
 
   archiveAndReset();
   restore();
   refresh();
+}
 
-  ids.forEach(id => {
-    document.getElementById(id).addEventListener('input', refresh);
-  });
-  el.btnReset().addEventListener('click', reset);
-  el.btnAddSub().addEventListener('click', addSub);
-  el.btnAppliquerDette().addEventListener('click', applyDebtPayment);
+function clearAppData() {
+  ids.forEach(id => { const domEl = document.getElementById(id); if (domEl) domEl.value = ''; });
+  subs = [];
+  renderSubs();
+  goal = { nom: '', montant: '' };
+  el.goalNom().value     = '';
+  el.goalMontant().value = '';
+  if (chart) { chart.destroy(); chart = null; }
+}
+
+// ── Init ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Auth UI
+  document.getElementById('tabLogin').addEventListener('click',  () => setAuthMode('login'));
+  document.getElementById('tabSignup').addEventListener('click', () => setAuthMode('signup'));
+  document.getElementById('btnAuth').addEventListener('click',   handleAuth);
+  document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleAuth(); });
+  document.getElementById('btnLogout').addEventListener('click', () => _sb.auth.signOut());
+
+  // App inputs
+  el.goalNom().addEventListener('input',     () => { goal.nom     = el.goalNom().value;     saveGoal(); });
+  el.goalMontant().addEventListener('input', () => { goal.montant = el.goalMontant().value; saveGoal(); refresh(); });
+  ids.forEach(id => { document.getElementById(id).addEventListener('input', refresh); });
+  el.btnReset().addEventListener('click',             reset);
+  el.btnAddSub().addEventListener('click',            addSub);
+  el.btnAppliquerDette().addEventListener('click',    applyDebtPayment);
   el.btnAppliquerDispatch().addEventListener('click', applyDispatch);
-  el.btnAppliquerPrime().addEventListener('click', applyPrime);
+  el.btnAppliquerPrime().addEventListener('click',    applyPrime);
+
+  // Auth state
+  _sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+      currentUser = session?.user ?? null;
+      if (currentUser) {
+        document.getElementById('headerUserEmail').textContent = currentUser.email;
+        document.getElementById('headerUser').hidden = false;
+        await loadFromCloud();
+        showApp();
+        initAppData();
+      } else {
+        // Pas de session au démarrage
+        showAuth();
+      }
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      document.getElementById('headerUser').hidden = true;
+      clearAppData();
+      showAuth();
+    }
+  });
 });

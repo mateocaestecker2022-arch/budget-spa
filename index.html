@@ -5,16 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestionnaire de Budget</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
   <header class="header">
-    <h1>Gestionnaire de Budget</h1>
-    <p class="header-sub" id="headerMonth">Suivi mensuel de vos finances personnelles</p>
+    <div class="header-content">
+      <h1>Gestionnaire de Budget</h1>
+      <p class="header-sub" id="headerMonth">Suivi mensuel de vos finances personnelles</p>
+    </div>
+    <div class="header-user" id="headerUser" hidden>
+      <span class="header-user-email" id="headerUserEmail"></span>
+      <button class="btn-logout" id="btnLogout" type="button">Déconnexion</button>
+    </div>
   </header>
 
-  <main class="main-grid">
+  <!-- Écran d'authentification -->
+  <div class="auth-overlay" id="authOverlay">
+    <p class="auth-loading" id="authLoading">Chargement…</p>
+    <div class="auth-card" id="authCard" hidden>
+      <div class="auth-logo">
+        <h2>Gestionnaire de Budget</h2>
+        <p>Synchronise tes données sur tous tes appareils</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" type="button">Connexion</button>
+        <button class="auth-tab" id="tabSignup" type="button">Créer un compte</button>
+      </div>
+      <div class="form-group">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" placeholder="ton@email.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="authPassword">Mot de passe</label>
+        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <p id="authError" hidden></p>
+      <button class="btn-auth" id="btnAuth" type="button">Se connecter</button>
+    </div>
+  </div>
+
+  <main class="main-grid" id="mainContent" hidden>
 
     <!-- Colonne gauche : saisie -->
     <section class="card" aria-label="Saisie des données">
