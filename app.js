@@ -713,6 +713,7 @@ function loadTheme() {
   const saved = localStorage.getItem(THEME_KEY) || 'light';
   applyTheme(saved);
 }
+window.toggleTheme = toggleTheme;
 
 // ── Auth ────────────────────────────────────────────────────────
 let authMode = 'login';
