@@ -52,6 +52,7 @@ const el = {
   resteAVivre:          () => document.getElementById('resteAVivre'),
   alert:                () => document.getElementById('alert'),
   sousDecoteDisplay:    () => document.getElementById('sousDecoteDisplay'),
+  detteRestanteResult:  () => document.getElementById('detteRestanteResult'),
   btnReset:             () => document.getElementById('btnReset'),
   headerMonth:          () => document.getElementById('headerMonth'),
   compareSection:       () => document.getElementById('compareSection'),
@@ -237,6 +238,7 @@ function updateDOM(data) {
   el.alert().hidden = resteAVivre >= 0;
 
   el.sousDecoteDisplay().textContent    = fmt(sousDecote);
+  el.detteRestanteResult().textContent  = fmt(data.detteRestante);
   el.subsTotal().textContent            = fmt(data.abonnements);
   el.detteRestanteDisplay().textContent = fmt(data.detteRestante);
 }

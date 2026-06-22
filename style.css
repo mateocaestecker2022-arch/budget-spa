@@ -203,6 +203,10 @@ body {
   font-size: 1.3rem;
 }
 
+.result-value--debt {
+  color: var(--color-danger);
+}
+
 .result-item {
   background: var(--color-bg);
   border-radius: 10px;
