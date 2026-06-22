@@ -44,11 +44,6 @@
       </div>
 
       <div class="form-group">
-        <label for="dette">Dette / Remboursement (€)</label>
-        <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
-      </div>
-
-      <div class="form-group">
         <label for="facture">Factures (eau, élec, internet…) (€)</label>
         <input type="number" id="facture" min="0" step="1" placeholder="ex: 120" />
       </div>
@@ -59,11 +54,6 @@
       </div>
 
       <h3 class="section-label">Épargne</h3>
-
-      <div class="form-group">
-        <label for="epargne">Objectif d'épargne mensuelle (€)</label>
-        <input type="number" id="epargne" min="0" step="1" placeholder="ex: 300" />
-      </div>
 
       <div class="form-group">
         <label for="sousDecote">Sous de côté (total cumulé) (€)</label>
@@ -92,24 +82,9 @@
           <span class="result-label">Reste à vivre</span>
           <span class="result-value" id="resteAVivre">0 €</span>
         </div>
-        <div class="result-item">
-          <span class="result-label">Taux d'épargne</span>
-          <span class="result-value" id="tauxEpargne">0 %</span>
-        </div>
         <div class="result-item result-item--wide">
           <span class="result-label">Sous de côté</span>
           <span class="result-value result-value--savings" id="sousDecoteDisplay">0 €</span>
-        </div>
-      </div>
-
-      <!-- Barre de progression épargne -->
-      <div class="progress-section">
-        <div class="progress-header">
-          <span>Progression épargne</span>
-          <span id="progressLabel">0 / 0 €</span>
-        </div>
-        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div class="progress-fill" id="progressFill"></div>
         </div>
       </div>
 
@@ -180,47 +155,104 @@
         <input type="number" id="prime" min="0" step="1" placeholder="ex: 500" />
       </div>
 
-      <h3 class="section-label">Répartition (%)</h3>
+      <h3 class="section-label">Répartition (€)</h3>
 
       <div class="prime-split-grid">
         <div class="form-group">
-          <label for="primePctEpargne">Épargne</label>
-          <input type="number" id="primePctEpargne" min="0" max="100" step="1" placeholder="0" />
+          <label for="primeMontantEpargne">Épargne</label>
+          <input type="number" id="primeMontantEpargne" min="0" step="1" placeholder="ex: 100" />
         </div>
         <div class="form-group">
-          <label for="primePctSousDecote">Sous de côté</label>
-          <input type="number" id="primePctSousDecote" min="0" max="100" step="1" placeholder="0" />
+          <label for="primeMontantSousDecote">Sous de côté</label>
+          <input type="number" id="primeMontantSousDecote" min="0" step="1" placeholder="ex: 100" />
         </div>
         <div class="form-group">
-          <label for="primePctReste">Reste à vivre</label>
-          <input type="number" id="primePctReste" min="0" max="100" step="1" placeholder="0" />
+          <label for="primeMontantReste">Reste à vivre</label>
+          <input type="number" id="primeMontantReste" min="0" step="1" placeholder="ex: 100" />
         </div>
         <div class="form-group">
-          <label for="primePctDette">Dette</label>
-          <input type="number" id="primePctDette" min="0" max="100" step="1" placeholder="0" />
+          <label for="primeMontantDette">Dette</label>
+          <input type="number" id="primeMontantDette" min="0" step="1" placeholder="ex: 100" />
         </div>
       </div>
 
-      <p class="prime-pct-total" id="primePctTotal">Répartition totale : 0 %</p>
+      <p class="prime-montant-total" id="primeMontantTotal">Réparti : 0 € / 0 €</p>
 
-      <div class="prime-results-grid">
-        <div class="result-item">
-          <span class="result-label">→ Épargne</span>
-          <span class="result-value" id="primeAmtEpargne">0 €</span>
+      <button class="btn-apply-prime" id="btnAppliquerPrime" type="button">Appliquer la répartition</button>
+    </section>
+
+    <!-- Dette -->
+    <section class="card card--debt" id="debtSection" aria-label="Dette">
+      <h2 class="card-title">Dette</h2>
+
+      <div class="form-group">
+        <label for="detteRestante">Dette restante (total) (€)</label>
+        <input type="number" id="detteRestante" min="0" step="1" placeholder="ex: 5000" />
+      </div>
+
+      <div class="form-group">
+        <label for="dette">Remboursement mensuel (€)</label>
+        <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
+      </div>
+
+      <h3 class="section-label">Remboursement ponctuel</h3>
+
+      <div class="debt-extra-row">
+        <div class="form-group">
+          <label for="detteRemboursementExtra">Montant à remettre dans la dette (€)</label>
+          <input type="number" id="detteRemboursementExtra" min="0" step="1" placeholder="ex: 100" />
         </div>
+        <button class="btn-apply-debt" id="btnAppliquerDette" type="button">Appliquer au total</button>
+      </div>
+
+      <div class="result-item result-item--wide">
+        <span class="result-label">Dette restante</span>
+        <span class="result-value" id="detteRestanteDisplay">0 €</span>
+      </div>
+    </section>
+
+    <!-- Répartition du reste à vivre -->
+    <section class="card card--dispatch" id="dispatchSection" aria-label="Répartition du reste à vivre">
+      <h2 class="card-title">Répartition du reste à vivre</h2>
+
+      <div class="dispatch-recap-grid">
+        <div class="result-item">
+          <span class="result-label">Total charges</span>
+          <span class="result-value" id="dispatchTotalCharges">0 €</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Reste à vivre disponible</span>
+          <span class="result-value" id="dispatchReste">0 €</span>
+        </div>
+      </div>
+
+      <h3 class="section-label">Répartition (%)</h3>
+
+      <div class="dispatch-split-grid">
+        <div class="form-group">
+          <label for="dispatchPctSousDecote">Sous de côté</label>
+          <input type="number" id="dispatchPctSousDecote" min="0" max="100" step="1" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label for="dispatchPctDette">Dette</label>
+          <input type="number" id="dispatchPctDette" min="0" max="100" step="1" placeholder="0" />
+        </div>
+      </div>
+
+      <p class="dispatch-pct-total" id="dispatchPctTotal">Répartition totale : 0 %</p>
+
+      <div class="dispatch-results-grid">
         <div class="result-item">
           <span class="result-label">→ Sous de côté</span>
-          <span class="result-value" id="primeAmtSousDecote">0 €</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">→ Reste à vivre</span>
-          <span class="result-value" id="primeAmtReste">0 €</span>
+          <span class="result-value" id="dispatchAmtSousDecote">0 €</span>
         </div>
         <div class="result-item">
           <span class="result-label">→ Dette</span>
-          <span class="result-value" id="primeAmtDette">0 €</span>
+          <span class="result-value" id="dispatchAmtDette">0 €</span>
         </div>
       </div>
+
+      <button class="btn-apply-dispatch" id="btnAppliquerDispatch" type="button">Appliquer la répartition</button>
     </section>
 
     <!-- Comparaison mois précédent -->
@@ -236,11 +268,6 @@
           <span class="compare-label">Reste à vivre</span>
           <span class="compare-prev" id="cmp-resteAVivre">—</span>
           <span class="compare-delta" id="dlt-resteAVivre"></span>
-        </div>
-        <div class="compare-item">
-          <span class="compare-label">Taux d'épargne</span>
-          <span class="compare-prev" id="cmp-tauxEpargne">—</span>
-          <span class="compare-delta" id="dlt-tauxEpargne"></span>
         </div>
         <div class="compare-item">
           <span class="compare-label">Sous de côté</span>

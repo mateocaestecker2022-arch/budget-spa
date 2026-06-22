@@ -8,7 +8,7 @@ Ne pas déclarer "tout va bien" avant d'avoir vérifié chaque section.
 ## RÈGLES ABSOLUES
 
 1. **Ne jamais conclure ✅ sur un seul test** — vérifier chaque exigence fonctionnelle individuellement
-2. **Tester les cas limites** — salaire = 0, charges > salaire, épargne > reste à vivre
+2. **Tester les cas limites** — salaire = 0, charges > salaire, reste à vivre négatif
 3. **Valider sur desktop ET mobile** — le responsive est une exigence non fonctionnelle critique
 4. **Vérifier les calculs à la main** — ne pas faire confiance au code sans contre-vérification manuelle
 
@@ -20,13 +20,11 @@ Ne pas déclarer "tout va bien" avant d'avoir vérifié chaque section.
 |------|----------|---------|----------|
 | EF-01 | Saisie du salaire mensuel net | ✅/❌ | |
 | EF-02 | Saisie des charges fixes (loyer, nourriture, assurance, dette) | ✅/❌ | |
-| EF-03 | Définition d'une cible d'épargne mensuelle | ✅/❌ | |
 | EF-04 | Calcul du total des charges en temps réel | ✅/❌ | |
 | EF-05 | Calcul du reste à vivre | ✅/❌ | |
 | EF-06 | Graphique de répartition (Chart.js) | ✅/❌ | |
-| EF-07 | Barre de progression de l'épargne | ✅/❌ | |
 | EF-08 | Alerte si reste à vivre < 0 | ✅/❌ | |
-| EF-09 | Sauvegarde des données en sessionStorage | ✅/❌ | |
+| EF-09 | Sauvegarde des données en localStorage | ✅/❌ | |
 | EF-10 | Réinitialisation des données | ✅/❌ | |
 
 ---
@@ -42,21 +40,18 @@ Loyer        = 800
 Nourriture   = 400
 Assurance    = 150
 Dette        = 200
-Épargne      = 300
 
 Total charges attendu = 800 + 400 + 150 + 200 = 1550
-Reste à vivre attendu = 2500 − 1550 − 300 = 650
-Taux d'épargne attendu = (300 ÷ 2500) × 100 = 12%
-Alerte attendue = NON (650 ≥ 0)
+Reste à vivre attendu = 2500 − 1550 = 950
+Alerte attendue = NON (950 ≥ 0)
 ```
 
 **Jeu de test déséquilibre :**
 ```
 Salaire      = 1500
 Charges      = 1800
-Épargne      = 200
 
-Reste à vivre attendu = 1500 − 1800 − 200 = −500
+Reste à vivre attendu = 1500 − 1800 = −300
 Alerte attendue = OUI (rouge visible)
 ```
 
@@ -77,7 +72,7 @@ Reste à vivre = 0, aucune division par zéro, pas de NaN affiché
 
 **Checks :**
 - Le graphique s'affiche correctement au chargement
-- Les segments correspondent aux catégories (loyer, nourriture, assurance, dette, épargne, reste à vivre)
+- Les segments correspondent aux catégories (loyer, nourriture, assurance, dette, factures, autres, abonnements, reste à vivre)
 - Le graphique se met à jour en temps réel à chaque modification
 - Les couleurs sont distinctes et lisibles
 - Le graphique ne plante pas si une valeur est 0
@@ -93,16 +88,16 @@ Reste à vivre = 0, aucune division par zéro, pas de NaN affiché
 
 ---
 
-## 5. SessionStorage
+## 5. LocalStorage
 
 **Checks :**
 - Après saisie, les valeurs persistent si on recharge la page (F5)
-- La réinitialisation vide bien le sessionStorage
+- La réinitialisation vide bien les champs mensuels, en conservant Sous de côté et Dette restante
 - Aucune erreur console liée au storage
 
 ```javascript
 // Vérification manuelle dans la console navigateur
-console.log(sessionStorage.getItem('budgetData'))
+console.log(localStorage.getItem('budgetData'))
 // Doit retourner les données saisies en JSON
 ```
 
@@ -152,9 +147,8 @@ console.log(sessionStorage.getItem('budgetData'))
 - Aucune erreur dans la console navigateur (F12 → Console)
 - Aucun `console.log` de debug oublié
 - Les formules de calcul correspondent exactement à la spec :
-  - `Total charges = Loyer + Nourriture + Assurance + Dette`
-  - `Reste à vivre = Salaire − Total charges − Épargne`
-  - `Taux d'épargne = (Épargne ÷ Salaire) × 100`
+  - `Total charges = Loyer + Nourriture + Assurance + Dette + Factures + Autres + Abonnements`
+  - `Reste à vivre = Salaire − Total charges`
   - `Alerte = Reste à vivre < 0`
 
 ---
@@ -167,7 +161,7 @@ console.log(sessionStorage.getItem('budgetData'))
 | Formules de calcul | ✅/⚠️/❌ | |
 | Graphique Chart.js | ✅/⚠️/❌ | |
 | Alerte déséquilibre | ✅/⚠️/❌ | |
-| SessionStorage | ✅/⚠️/❌ | |
+| LocalStorage | ✅/⚠️/❌ | |
 | Performance | ✅/⚠️/❌ | |
 | Responsive / mobile | ✅/⚠️/❌ | |
 | Accessibilité | ✅/⚠️/❌ | |

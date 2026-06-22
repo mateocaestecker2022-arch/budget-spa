@@ -6,7 +6,7 @@ const GOAL_KEY = 'budgetGoal';
 let subs = [];
 let goal = { nom: '', montant: '' };
 
-const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'epargne', 'sousDecote', 'prime', 'primePctEpargne', 'primePctSousDecote', 'primePctReste', 'primePctDette'];
+const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
 
 const el = {
   salaire:           () => document.getElementById('salaire'),
@@ -16,8 +16,17 @@ const el = {
   dette:             () => document.getElementById('dette'),
   facture:           () => document.getElementById('facture'),
   autres:            () => document.getElementById('autres'),
-  epargne:           () => document.getElementById('epargne'),
   sousDecote:        () => document.getElementById('sousDecote'),
+  detteRestante:        () => document.getElementById('detteRestante'),
+  detteRemboursementExtra: () => document.getElementById('detteRemboursementExtra'),
+  detteRestanteDisplay: () => document.getElementById('detteRestanteDisplay'),
+  btnAppliquerDette:    () => document.getElementById('btnAppliquerDette'),
+  dispatchTotalCharges: () => document.getElementById('dispatchTotalCharges'),
+  dispatchReste:        () => document.getElementById('dispatchReste'),
+  dispatchPctTotal:     () => document.getElementById('dispatchPctTotal'),
+  dispatchAmtSousDecote: () => document.getElementById('dispatchAmtSousDecote'),
+  dispatchAmtDette:      () => document.getElementById('dispatchAmtDette'),
+  btnAppliquerDispatch:  () => document.getElementById('btnAppliquerDispatch'),
   subsList:          () => document.getElementById('subsList'),
   subsTotal:         () => document.getElementById('subsTotal'),
   btnAddSub:         () => document.getElementById('btnAddSub'),
@@ -29,18 +38,11 @@ const el = {
   goalProgressBar:      () => document.getElementById('goalProgressBar'),
   capaciteEpargne:      () => document.getElementById('capaciteEpargne'),
   goalEstimation:       () => document.getElementById('goalEstimation'),
-  primePctTotal:     () => document.getElementById('primePctTotal'),
-  primeAmtEpargne:    () => document.getElementById('primeAmtEpargne'),
-  primeAmtSousDecote: () => document.getElementById('primeAmtSousDecote'),
-  primeAmtReste:      () => document.getElementById('primeAmtReste'),
-  primeAmtDette:      () => document.getElementById('primeAmtDette'),
+  primeMontantTotal: () => document.getElementById('primeMontantTotal'),
+  btnAppliquerPrime: () => document.getElementById('btnAppliquerPrime'),
   totalCharges:      () => document.getElementById('totalCharges'),
   resteAVivre:       () => document.getElementById('resteAVivre'),
-  tauxEpargne:       () => document.getElementById('tauxEpargne'),
   alert:             () => document.getElementById('alert'),
-  progressFill:      () => document.getElementById('progressFill'),
-  progressLabel:     () => document.getElementById('progressLabel'),
-  progressBar:       () => document.querySelector('.progress-bar'),
   sousDecoteDisplay: () => document.getElementById('sousDecoteDisplay'),
   btnReset:          () => document.getElementById('btnReset'),
   headerMonth:       () => document.getElementById('headerMonth'),
@@ -156,24 +158,26 @@ function compute() {
   const dette      = val('dette');
   const facture    = val('facture');
   const autres     = val('autres');
-  const epargne    = val('epargne');
   const sousDecote = val('sousDecote');
+  const detteRestante = val('detteRestante');
   const abonnements = subsTotalAmount();
 
-  const prime               = val('prime');
-  const primePctEpargne     = val('primePctEpargne');
-  const primePctSousDecote  = val('primePctSousDecote');
-  const primePctReste       = val('primePctReste');
-  const primePctDette       = val('primePctDette');
-  const primePctTotal       = primePctEpargne + primePctSousDecote + primePctReste + primePctDette;
-  const primeAmtEpargne     = prime * primePctEpargne / 100;
-  const primeAmtSousDecote  = prime * primePctSousDecote / 100;
-  const primeAmtReste       = prime * primePctReste / 100;
-  const primeAmtDette       = prime * primePctDette / 100;
+  const prime                  = val('prime');
+  const primeMontantEpargne    = val('primeMontantEpargne');
+  const primeMontantSousDecote = val('primeMontantSousDecote');
+  const primeMontantReste      = val('primeMontantReste');
+  const primeMontantDette      = val('primeMontantDette');
+  const primeMontantTotal      = primeMontantEpargne + primeMontantSousDecote + primeMontantReste + primeMontantDette;
 
   const totalCharges = loyer + nourriture + assurance + dette + facture + autres + abonnements;
-  const resteAVivre  = salaire - totalCharges - epargne;
-  const tauxEpargne  = salaire > 0 ? (epargne / salaire) * 100 : 0;
+  const resteAVivre  = salaire - totalCharges;
+
+  const dispatchPctSousDecote = val('dispatchPctSousDecote');
+  const dispatchPctDette      = val('dispatchPctDette');
+  const dispatchPctTotal      = dispatchPctSousDecote + dispatchPctDette;
+  const dispatchBase          = Math.max(0, resteAVivre);
+  const dispatchAmtSousDecote = dispatchBase * dispatchPctSousDecote / 100;
+  const dispatchAmtDette      = dispatchBase * dispatchPctDette / 100;
 
   const goalMontant      = Math.max(0, parseFloat(goal.montant) || 0);
   const capaciteEpargne  = salaire - totalCharges;
@@ -182,17 +186,17 @@ function compute() {
   const goalMonthsLeft   = capaciteEpargne > 0 ? Math.ceil(goalRemaining / capaciteEpargne) : null;
 
   return {
-    salaire, loyer, nourriture, assurance, dette, facture, autres, epargne, sousDecote, abonnements,
-    totalCharges, resteAVivre, tauxEpargne,
-    prime, primePctEpargne, primePctSousDecote, primePctReste, primePctDette,
-    primePctTotal, primeAmtEpargne, primeAmtSousDecote, primeAmtReste, primeAmtDette,
+    salaire, loyer, nourriture, assurance, dette, facture, autres, sousDecote, detteRestante, abonnements,
+    totalCharges, resteAVivre,
+    prime, primeMontantEpargne, primeMontantSousDecote, primeMontantReste, primeMontantDette, primeMontantTotal,
     goalMontant, capaciteEpargne, goalProgressPct, goalRemaining, goalMonthsLeft,
+    dispatchBase, dispatchPctSousDecote, dispatchPctDette, dispatchPctTotal, dispatchAmtSousDecote, dispatchAmtDette,
   };
 }
 
 // ── Mise à jour DOM ────────────────────────────────────────────
 function updateDOM(data) {
-  const { totalCharges, resteAVivre, tauxEpargne, epargne, salaire, sousDecote } = data;
+  const { totalCharges, resteAVivre, sousDecote } = data;
 
   el.totalCharges().textContent = fmt(totalCharges);
 
@@ -200,30 +204,78 @@ function updateDOM(data) {
   resteEl.textContent = fmt(resteAVivre);
   resteEl.classList.toggle('negative', resteAVivre < 0);
 
-  el.tauxEpargne().textContent = tauxEpargne.toFixed(1) + ' %';
   el.alert().hidden = resteAVivre >= 0;
-
-  const pct = salaire > 0 ? Math.min(100, (epargne / salaire) * 100) : 0;
-  el.progressFill().style.width = pct + '%';
-  el.progressBar().setAttribute('aria-valuenow', Math.round(pct));
-  el.progressLabel().textContent = fmt(epargne) + ' / ' + fmt(salaire);
 
   el.sousDecoteDisplay().textContent = fmt(sousDecote);
   el.subsTotal().textContent = fmt(data.abonnements);
+  el.detteRestanteDisplay().textContent = fmt(data.detteRestante);
+}
+
+// ── Remboursement ponctuel de dette ────────────────────────────
+function applyDebtPayment() {
+  const extra = val('detteRemboursementExtra');
+  if (extra <= 0) return;
+  const next = Math.max(0, val('detteRestante') - extra);
+  el.detteRestante().value = next || '';
+  el.detteRemboursementExtra().value = '';
+  refresh();
+}
+
+// ── Répartition du reste à vivre ────────────────────────────────
+function updateDispatch(data) {
+  const { totalCharges, dispatchBase, dispatchPctTotal, dispatchAmtSousDecote, dispatchAmtDette } = data;
+
+  el.dispatchTotalCharges().textContent = fmt(totalCharges);
+  el.dispatchReste().textContent = fmt(dispatchBase);
+
+  const totalEl = el.dispatchPctTotal();
+  totalEl.textContent = `Répartition totale : ${dispatchPctTotal} %`;
+  totalEl.classList.toggle('warning', dispatchBase > 0 && dispatchPctTotal !== 100);
+
+  el.dispatchAmtSousDecote().textContent = fmt(dispatchAmtSousDecote);
+  el.dispatchAmtDette().textContent = fmt(dispatchAmtDette);
+}
+
+function applyDispatch() {
+  const { dispatchAmtSousDecote, dispatchAmtDette } = compute();
+  if (dispatchAmtSousDecote <= 0 && dispatchAmtDette <= 0) return;
+
+  const newSousDecote    = val('sousDecote') + dispatchAmtSousDecote;
+  const newDetteRestante = Math.max(0, val('detteRestante') - dispatchAmtDette);
+
+  el.sousDecote().value    = newSousDecote || '';
+  el.detteRestante().value = newDetteRestante || '';
+  document.getElementById('dispatchPctSousDecote').value = '';
+  document.getElementById('dispatchPctDette').value = '';
+  refresh();
 }
 
 // ── Mise à jour répartition prime ──────────────────────────────
 function updatePrime(data) {
-  const { prime, primePctTotal, primeAmtEpargne, primeAmtSousDecote, primeAmtReste, primeAmtDette } = data;
+  const { prime, primeMontantTotal } = data;
 
-  const totalEl = el.primePctTotal();
-  totalEl.textContent = `Répartition totale : ${primePctTotal} %`;
-  totalEl.classList.toggle('warning', prime > 0 && primePctTotal !== 100);
+  const totalEl = el.primeMontantTotal();
+  totalEl.textContent = `Réparti : ${fmt(primeMontantTotal)} / ${fmt(prime)}`;
+  totalEl.classList.toggle('warning', prime > 0 && primeMontantTotal !== prime);
+}
 
-  el.primeAmtEpargne().textContent = fmt(primeAmtEpargne);
-  el.primeAmtSousDecote().textContent = fmt(primeAmtSousDecote);
-  el.primeAmtReste().textContent = fmt(primeAmtReste);
-  el.primeAmtDette().textContent = fmt(primeAmtDette);
+function applyPrime() {
+  const { primeMontantEpargne, primeMontantSousDecote, primeMontantDette } = compute();
+  const versSousDecote = primeMontantEpargne + primeMontantSousDecote;
+  if (versSousDecote <= 0 && primeMontantDette <= 0) return;
+
+  const newSousDecote    = val('sousDecote') + versSousDecote;
+  const newDetteRestante = Math.max(0, val('detteRestante') - primeMontantDette);
+
+  el.sousDecote().value    = newSousDecote || '';
+  el.detteRestante().value = newDetteRestante || '';
+
+  document.getElementById('prime').value = '';
+  document.getElementById('primeMontantEpargne').value = '';
+  document.getElementById('primeMontantSousDecote').value = '';
+  document.getElementById('primeMontantReste').value = '';
+  document.getElementById('primeMontantDette').value = '';
+  refresh();
 }
 
 // ── Mise à jour objectif d'épargne ──────────────────────────────
@@ -251,12 +303,12 @@ function updateGoal(data) {
 
 // ── Graphique Chart.js ─────────────────────────────────────────
 function updateChart(data) {
-  const { loyer, nourriture, assurance, dette, facture, autres, abonnements, epargne, resteAVivre } = data;
+  const { loyer, nourriture, assurance, dette, facture, autres, abonnements, resteAVivre } = data;
 
   const restePositif = Math.max(0, resteAVivre);
-  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Factures', 'Autres', 'Abonnements', 'Épargne', 'Reste à vivre'];
-  const values = [loyer, nourriture, assurance, dette, facture, autres, abonnements, epargne, restePositif];
-  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e', '#0ea5e9', '#06b6d4', '#a3e635'];
+  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Factures', 'Autres', 'Abonnements', 'Reste à vivre'];
+  const values = [loyer, nourriture, assurance, dette, facture, autres, abonnements, restePositif];
+  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e', '#0ea5e9', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;
@@ -308,7 +360,6 @@ function updateCompare(current) {
   const fields = [
     { id: 'totalCharges', label: 'totalCharges', format: fmt },
     { id: 'resteAVivre',  label: 'resteAVivre',  format: fmt },
-    { id: 'tauxEpargne',  label: 'tauxEpargne',  format: v => v.toFixed(1) + ' %' },
     { id: 'sousDecote',   label: 'sousDecote',    format: fmt },
   ];
 
@@ -322,7 +373,7 @@ function updateCompare(current) {
     const dltEl = document.getElementById(`dlt-${id}`);
     if (delta === 0) { dltEl.textContent = '='; dltEl.className = 'compare-delta'; return; }
     const sign = delta > 0 ? '+' : '';
-    dltEl.textContent = sign + (id === 'tauxEpargne' ? delta.toFixed(1) + ' %' : fmt(delta));
+    dltEl.textContent = sign + fmt(delta);
     dltEl.className = 'compare-delta ' + (delta > 0 ? 'delta--up' : 'delta--down');
   });
 }
@@ -350,20 +401,23 @@ function archiveAndReset() {
     const stored = JSON.parse(raw);
     if (!stored.month || stored.month === currentMonthKey()) return;
 
+    const sousDecoteReportee = stored.sousDecote ?? 0;
+    const detteRestanteReportee = stored.detteRestante ?? 0;
+
     // Archiver le mois passé
     const history = loadHistory();
     history[stored.month] = {
-      totalCharges: stored.totalCharges ?? 0,
-      resteAVivre:  stored.resteAVivre  ?? 0,
-      tauxEpargne:  stored.tauxEpargne  ?? 0,
-      sousDecote:   stored.sousDecote   ?? 0,
+      totalCharges:  stored.totalCharges  ?? 0,
+      resteAVivre:   stored.resteAVivre   ?? 0,
+      sousDecote:    sousDecoteReportee,
+      detteRestante: detteRestanteReportee,
     };
     saveHistory(history);
 
-    // Reporter uniquement les sous de côté
-    const sousDecoteReporte = stored.sousDecote ?? 0;
+    // Reporter le sous de côté et la dette restante (soldes cumulés)
     localStorage.removeItem(STORAGE_KEY);
-    document.getElementById('sousDecote').value = sousDecoteReporte || '';
+    document.getElementById('sousDecote').value = sousDecoteReportee || '';
+    document.getElementById('detteRestante').value = detteRestanteReportee || '';
 
   } catch {}
 }
@@ -383,8 +437,10 @@ function restore() {
 // ── Réinitialisation du mois ───────────────────────────────────
 function reset() {
   const sousDecote = val('sousDecote');
+  const detteRestante = val('detteRestante');
   ids.forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('sousDecote').value = sousDecote || '';
+  document.getElementById('detteRestante').value = detteRestante || '';
   localStorage.removeItem(STORAGE_KEY);
   refresh();
 }
@@ -395,6 +451,7 @@ function refresh() {
   updateDOM(data);
   updatePrime(data);
   updateGoal(data);
+  updateDispatch(data);
   updateChart(data);
   updateCompare(data);
   save(data);
@@ -427,4 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   el.btnReset().addEventListener('click', reset);
   el.btnAddSub().addEventListener('click', addSub);
+  el.btnAppliquerDette().addEventListener('click', applyDebtPayment);
+  el.btnAppliquerDispatch().addEventListener('click', applyDispatch);
+  el.btnAppliquerPrime().addEventListener('click', applyPrime);
 });

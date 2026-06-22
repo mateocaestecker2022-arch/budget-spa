@@ -9,13 +9,12 @@ Application web monopage (SPA) de suivi budgétaire mensuel, 100 % côté client
 | Structure | HTML5 |
 | Logique | JavaScript vanilla |
 | Graphiques | Chart.js |
-| Stockage | sessionStorage (navigateur) |
+| Stockage | localStorage (navigateur) |
 
 ## Règles de calcul (impératives)
 ```
-Total charges   = Loyer + Nourriture + Assurance + Dette
-Reste à vivre   = Salaire − Total charges − Épargne
-Taux d'épargne  = (Épargne ÷ Salaire) × 100
+Total charges   = Loyer + Nourriture + Assurance + Dette + Factures + Autres + Abonnements
+Reste à vivre   = Salaire − Total charges
 Alerte          = si Reste à vivre < 0
 ```
 
@@ -24,14 +23,14 @@ Alerte          = si Reste à vivre < 0
 |---|---|---|
 | EF-01 | Saisir le salaire mensuel net | Haute |
 | EF-02 | Saisir les charges fixes (loyer, nourriture, assurance, dette) | Haute |
-| EF-03 | Définir une cible d'épargne mensuelle | Haute |
 | EF-04 | Calculer le total des charges en temps réel | Haute |
 | EF-05 | Calculer le reste à vivre | Haute |
 | EF-06 | Afficher la répartition en graphique (Chart.js) | Haute |
-| EF-07 | Barre de progression de l'épargne | Moyenne |
 | EF-08 | Alerter si le reste à vivre est négatif | Haute |
-| EF-09 | Sauvegarder les données de session (sessionStorage) | Moyenne |
+| EF-09 | Sauvegarder les données (localStorage) | Moyenne |
 | EF-10 | Réinitialiser les données | Basse |
+
+> EF-03 (cible d'épargne mensuelle) et EF-07 (barre de progression épargne) ont été retirées : le suivi de l'épargne se fait désormais via Sous de côté, Objectif d'épargne long terme, Dette et Répartition du reste à vivre.
 
 ## Exigences non fonctionnelles
 - Recalcul instantané < 100 ms à chaque saisie
@@ -53,7 +52,7 @@ Alerte          = si Reste à vivre < 0
 gestionnaire de budgety/
 ├── index.html       # Structure et layout
 ├── style.css        # Styles et responsive
-├── app.js           # Logique, calculs, Chart.js, sessionStorage
+├── app.js           # Logique, calculs, Chart.js, localStorage
 └── CHECKPOINT.md    # Journal de progression
 ```
 
