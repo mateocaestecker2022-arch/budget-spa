@@ -146,7 +146,7 @@
     </section>
 
     <!-- Objectifs d'épargne -->
-    <section class="card card--goal" id="goalSection" aria-label="Objectifs d'épargne">
+    <section class="card" id="goalSection" aria-label="Objectifs d'épargne">
       <h2 class="card-title">Objectifs d'épargne</h2>
 
       <div class="result-item">
@@ -160,7 +160,7 @@
     </section>
 
     <!-- Abonnements -->
-    <section class="card card--subs" id="subsSection" aria-label="Abonnements">
+    <section class="card" id="subsSection" aria-label="Abonnements">
       <h2 class="card-title">Abonnements</h2>
 
       <div class="subs-list" id="subsList"></div>
@@ -173,8 +173,38 @@
       </div>
     </section>
 
+    <!-- Dette -->
+    <section class="card" id="debtSection" aria-label="Dette">
+      <h2 class="card-title">Dette</h2>
+
+      <div class="form-group">
+        <label for="detteRestante">Dette restante (total) (€)</label>
+        <input type="number" id="detteRestante" min="0" step="1" placeholder="ex: 5000" />
+      </div>
+
+      <div class="form-group">
+        <label for="dette">Remboursement mensuel (€)</label>
+        <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
+      </div>
+
+      <h3 class="section-label">Remboursement ponctuel</h3>
+
+      <div class="debt-extra-row">
+        <div class="form-group">
+          <label for="detteRemboursementExtra">Montant à remettre dans la dette (€)</label>
+          <input type="number" id="detteRemboursementExtra" min="0" step="1" placeholder="ex: 100" />
+        </div>
+        <button class="btn-apply-debt" id="btnAppliquerDette" type="button">Appliquer au total</button>
+      </div>
+
+      <div class="result-item result-item--wide">
+        <span class="result-label">Dette restante</span>
+        <span class="result-value" id="detteRestanteDisplay">0 €</span>
+      </div>
+    </section>
+
     <!-- Prime -->
-    <section class="card card--prime" id="primeSection" aria-label="Prime">
+    <section class="card" id="primeSection" aria-label="Prime">
       <h2 class="card-title">Prime</h2>
 
       <div class="form-group">
@@ -206,36 +236,6 @@
       <p class="prime-montant-total" id="primeMontantTotal">Réparti : 0 € / 0 €</p>
 
       <button class="btn-apply-prime" id="btnAppliquerPrime" type="button">Appliquer la répartition</button>
-    </section>
-
-    <!-- Dette -->
-    <section class="card card--debt" id="debtSection" aria-label="Dette">
-      <h2 class="card-title">Dette</h2>
-
-      <div class="form-group">
-        <label for="detteRestante">Dette restante (total) (€)</label>
-        <input type="number" id="detteRestante" min="0" step="1" placeholder="ex: 5000" />
-      </div>
-
-      <div class="form-group">
-        <label for="dette">Remboursement mensuel (€)</label>
-        <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
-      </div>
-
-      <h3 class="section-label">Remboursement ponctuel</h3>
-
-      <div class="debt-extra-row">
-        <div class="form-group">
-          <label for="detteRemboursementExtra">Montant à remettre dans la dette (€)</label>
-          <input type="number" id="detteRemboursementExtra" min="0" step="1" placeholder="ex: 100" />
-        </div>
-        <button class="btn-apply-debt" id="btnAppliquerDette" type="button">Appliquer au total</button>
-      </div>
-
-      <div class="result-item result-item--wide">
-        <span class="result-label">Dette restante</span>
-        <span class="result-value" id="detteRestanteDisplay">0 €</span>
-      </div>
     </section>
 
     <!-- Répartition du reste à vivre -->
