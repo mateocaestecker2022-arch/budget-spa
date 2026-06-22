@@ -195,6 +195,34 @@ function addGoal() {
   el.goalsList().querySelector('.goal-item:last-child .goal-name')?.focus();
 }
 
+// Met à jour uniquement les barres de progression, sans toucher aux inputs
+function updateGoalProgress(sousDecote, capaciteEpargne) {
+  const items = el.goalsList().querySelectorAll('.goal-item');
+  let remaining = sousDecote;
+  goals.forEach((g, idx) => {
+    const item = items[idx];
+    if (!item) return;
+    const target = Math.max(0, parseFloat(g.montant) || 0);
+    const filled = Math.min(remaining, target);
+    const pct    = target > 0 ? Math.min(100, (filled / target) * 100) : 0;
+    const left   = Math.max(0, target - filled);
+    const months = capaciteEpargne > 0 && left > 0 ? Math.ceil(left / capaciteEpargne) : null;
+    remaining = Math.max(0, remaining - filled);
+
+    item.querySelector('.goal-prog-label').textContent = `${fmt(filled)} / ${fmt(target)}`;
+    item.querySelector('.goal-prog-pct').textContent   = Math.round(pct) + ' %';
+    item.querySelector('.progress-fill').style.width   = pct + '%';
+    item.querySelector('.progress-bar').setAttribute('aria-valuenow', Math.round(pct));
+
+    const est = item.querySelector('.goal-estimation');
+    if (target <= 0)        est.textContent = 'Définis un montant cible';
+    else if (filled >= target) est.textContent = '✓ Objectif atteint !';
+    else if (months === null)  est.textContent = 'Pas d\'estimation possible';
+    else                       est.textContent = `Encore ${months} mois à ce rythme`;
+  });
+}
+
+// Reconstruction complète de la liste (structure + progress)
 function renderGoals(sousDecote, capaciteEpargne) {
   const list = el.goalsList();
   list.innerHTML = '';
@@ -207,16 +235,7 @@ function renderGoals(sousDecote, capaciteEpargne) {
     return;
   }
 
-  let remaining = sousDecote;
-
   goals.forEach((g, idx) => {
-    const target = Math.max(0, parseFloat(g.montant) || 0);
-    const filled = Math.min(remaining, target);
-    const pct    = target > 0 ? Math.min(100, (filled / target) * 100) : 0;
-    const left   = Math.max(0, target - filled);
-    const months = capaciteEpargne > 0 && left > 0 ? Math.ceil(left / capaciteEpargne) : null;
-    remaining = Math.max(0, remaining - filled);
-
     const item = document.createElement('div');
     item.className = 'goal-item';
 
@@ -244,7 +263,13 @@ function renderGoals(sousDecote, capaciteEpargne) {
     targetInput.placeholder = 'ex: 10000';
     targetInput.value = g.montant;
     targetInput.setAttribute('aria-label', 'Montant cible (€)');
-    targetInput.addEventListener('input', () => { g.montant = targetInput.value; saveGoals(); refresh(); });
+    // Ne pas appeler refresh() — met à jour uniquement la barre pour ne pas perdre le focus
+    targetInput.addEventListener('input', () => {
+      g.montant = targetInput.value;
+      saveGoals();
+      const { sousDecote, capaciteEpargne } = compute();
+      updateGoalProgress(sousDecote, capaciteEpargne);
+    });
 
     const actions = document.createElement('div');
     actions.className = 'goal-actions';
@@ -284,16 +309,16 @@ function renderGoals(sousDecote, capaciteEpargne) {
     actions.append(upBtn, downBtn, removeBtn);
     header.append(badge, nameInput, targetInput, actions);
 
-    // ─ Barre de progression
+    // ─ Barre de progression (contenu rempli par updateGoalProgress)
     const progressSection = document.createElement('div');
     progressSection.className = 'goal-progress';
 
     const progressHeader = document.createElement('div');
     progressHeader.className = 'progress-header';
     const labelLeft = document.createElement('span');
-    labelLeft.textContent = `${fmt(filled)} / ${fmt(target)}`;
+    labelLeft.className = 'goal-prog-label';
     const labelRight = document.createElement('span');
-    labelRight.textContent = Math.round(pct) + ' %';
+    labelRight.className = 'goal-prog-pct';
     progressHeader.append(labelLeft, labelRight);
 
     const progressBar = document.createElement('div');
@@ -301,28 +326,19 @@ function renderGoals(sousDecote, capaciteEpargne) {
     progressBar.setAttribute('role', 'progressbar');
     progressBar.setAttribute('aria-valuemin', '0');
     progressBar.setAttribute('aria-valuemax', '100');
-    progressBar.setAttribute('aria-valuenow', Math.round(pct));
     const progressFill = document.createElement('div');
     progressFill.className = 'progress-fill';
-    progressFill.style.width = pct + '%';
     progressBar.appendChild(progressFill);
 
     const estimation = document.createElement('p');
     estimation.className = 'goal-estimation';
-    if (target <= 0) {
-      estimation.textContent = 'Définis un montant cible';
-    } else if (filled >= target) {
-      estimation.textContent = '✓ Objectif atteint !';
-    } else if (months === null) {
-      estimation.textContent = 'Pas d\'estimation possible';
-    } else {
-      estimation.textContent = `Encore ${months} mois à ce rythme`;
-    }
 
     progressSection.append(progressHeader, progressBar, estimation);
     item.append(header, progressSection);
     list.appendChild(item);
   });
+
+  updateGoalProgress(sousDecote, capaciteEpargne);
 }
 
 // ── Calculs ────────────────────────────────────────────────────
@@ -453,7 +469,13 @@ function applyPrime() {
 // ── Objectifs d'épargne ──────────────────────────────────────────
 function updateGoal(data) {
   el.capaciteEpargne().textContent = fmt(data.capaciteEpargne);
-  renderGoals(data.sousDecote, data.capaciteEpargne);
+  // Si l'utilisateur tape dans un montant cible, ne pas re-rendre (perte de focus)
+  const focused = document.activeElement;
+  if (focused && focused.classList.contains('goal-target')) {
+    updateGoalProgress(data.sousDecote, data.capaciteEpargne);
+  } else {
+    renderGoals(data.sousDecote, data.capaciteEpargne);
+  }
 }
 
 // ── Graphique Chart.js ─────────────────────────────────────────
