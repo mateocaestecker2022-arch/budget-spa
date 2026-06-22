@@ -1,6 +1,6 @@
 # CHECKPOINT — Gestionnaire de Budget Personnel
 
-## État actuel : Phase 4 — TERMINÉ ✅
+## État actuel : Session 2026-06-22 — TERMINÉ ✅
 
 ---
 
@@ -69,18 +69,21 @@
 | + | Répartition du reste à vivre (dispatch Sous de côté / Dette) | ✅ Terminé |
 | + | Suppression Objectif d'épargne mensuelle (Taux d'épargne, barre épargne) | ✅ Terminé |
 | + | Skill `/propose` (plan structuré + "go" avant implémentation) | ✅ Terminé |
+| + | Authentification Supabase (email + mot de passe, sync cloud, cache offline) | ✅ Terminé |
+| + | Jour de réinitialisation configurable (1–28) | ✅ Terminé |
+| + | Objectifs d'épargne multiples avec priorité et distribution en cascade | ✅ Terminé |
+| + | Conseils intégrés sous la légende du graphique | ✅ Terminé |
+| + | Redesign 3 colonnes + design raffiné (validé) | ✅ Terminé |
+
+### 2026-06-22 (suite) — Comptes Supabase, objectifs multiples, redesign
+- [x] **Authentification Supabase** : écran login/signup (email + mot de passe) avant l'app ; table `budget_data` Postgres + Row Level Security par `user_id` ; localStorage conservé comme cache offline ; migration automatique des données locales au premier login ; client nommé `_sb` pour éviter le conflit avec l'export CDN `window.supabase`
+- [x] **Jour de réinitialisation configurable** : l'utilisateur choisit le jour du mois (1–28) auquel le mois se réinitialise ; clé de période `YYYY-MM-DD` remplace l'ancienne clé `YYYY-MM` ; compatibilité ascendante assurée
+- [x] **Carte Mon budget reorganisée** : Reste à vivre en premier, Total charges en second ; Dette restante ajoutée à côté de Sous de côté
+- [x] **Objectifs d'épargne multiples** : remplace l'objectif unique par une liste ordonnée par priorité ; chaque objectif a un nom + montant cible + boutons ↑/↓/× ; distribution des Sous de côté en cascade par ordre de priorité ; barre de progression + estimation en mois par objectif ; migration automatique de l'ancien format `{ nom, montant }` → tableau ; bug fix saisie montant sans perte de focus (séparation `renderGoals` / `updateGoalProgress`)
+- [x] **Conseils déplacés** dans la carte "Mon budget", sous la légende du graphique Chart.js
+- [x] **Redesign complet** : grille 3 colonnes desktop (Mes données | Mon budget | Objectifs, puis Abonnements | Dette | Prime, puis Répartition pleine largeur) ; tablette 2 colonnes ; mobile 1 colonne ; boutons Appliquer en violet plein + ombre ; valeurs monétaires plus grandes/grasses ; labels uppercase ; ombres douces ; barre de progression en dégradé ; redesign validé par l'utilisateur
 
 ---
-
-## Fonctionnalités planifiées
-
-### Système de comptes (synchronisation multi-appareils)
-
-- **Pourquoi** : les données sont actuellement en localStorage, propre à chaque navigateur/appareil — l'utilisateur ne retrouve pas ses saisies en changeant de téléphone/ordinateur.
-- **Approche validée** : compte avec email/mot de passe via **Supabase** (Auth + base Postgres), pas Firebase/Google — choix explicite de l'utilisateur pour ne pas dépendre de Google. Sécurité équivalente (Postgres, hashage des mots de passe, Row Level Security).
-- **Statut** : plan validé ("go"), en attente que l'utilisateur configure son projet Supabase (étapes communiquées : création compte/projet, table SQL `budget_data` avec RLS par `user_id`, récupération de l'URL projet + clé `anon public`).
-- **Une fois les clés fournies** : écran de connexion/inscription (email + mot de passe) avant l'accès à l'app, synchronisation de toutes les données (budget courant, historique, abonnements, objectif) dans le cloud, localStorage conservé comme cache local pour le fonctionnement hors-ligne, migration automatique des données locales existantes au premier login.
-- **Ce qui ne change pas pour les futurs utilisateurs** : la configuration Supabase est unique (faite une fois par le créateur de l'app) — tout utilisateur de l'app n'a qu'à créer un compte simple (email + mot de passe), sans aucune manipulation technique.
 
 ---
 
