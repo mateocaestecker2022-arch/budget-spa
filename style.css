@@ -137,6 +137,22 @@ body {
 
 .form-group input::placeholder { color: #b0bac7; }
 
+/* ── Jour de réinitialisation ──────────────────────────────── */
+.reset-day-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.reset-day-row input {
+  width: 72px;
+  flex: none;
+}
+.reset-day-suffix {
+  font-size: .85rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
 /* ── Bouton reset ──────────────────────────────────────────── */
 .btn-reset {
   margin-top: .5rem;

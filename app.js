@@ -1,7 +1,8 @@
-const STORAGE_KEY = 'budgetData';
-const HISTORY_KEY = 'budgetHistory';
-const SUBS_KEY    = 'budgetSubscriptions';
-const GOAL_KEY    = 'budgetGoal';
+const STORAGE_KEY    = 'budgetData';
+const HISTORY_KEY    = 'budgetHistory';
+const SUBS_KEY       = 'budgetSubscriptions';
+const GOAL_KEY       = 'budgetGoal';
+const RESET_DAY_KEY  = 'budgetResetDay';
 
 // ── Supabase ────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://pgocmfqnatzsxyihkjra.supabase.co';
@@ -11,6 +12,7 @@ let currentUser = null;
 
 let subs = [];
 let goal = { nom: '', montant: '' };
+let resetDay = 1;
 
 const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
 
@@ -59,15 +61,34 @@ const el = {
 
 let chart = null;
 
-// ── Mois ───────────────────────────────────────────────────────
-function currentMonthKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+// ── Période de réinitialisation ────────────────────────────────
+function currentPeriodKey(day) {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  const start = d >= day ? new Date(y, m, day) : new Date(y, m - 1, day);
+  return `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-function monthLabel(key) {
-  const [year, month] = key.split('-');
-  return new Date(year, month - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+function periodLabel(key) {
+  const parts = key.split('-');
+  if (parts.length === 2) {
+    // ancien format YYYY-MM
+    return new Date(parts[0], parts[1] - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+  }
+  const [year, month, day] = parts;
+  const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  const d = parseInt(day);
+  const monthStr = date.toLocaleString('fr-FR', { month: 'long' });
+  return d === 1 ? `${monthStr} ${year}` : `du ${d} ${monthStr} ${year}`;
+}
+
+function loadResetDay() {
+  try { return Math.max(1, Math.min(28, parseInt(localStorage.getItem(RESET_DAY_KEY)) || 1)); } catch { return 1; }
+}
+
+function saveResetDay() {
+  localStorage.setItem(RESET_DAY_KEY, String(resetDay));
+  syncToCloud(RESET_DAY_KEY, resetDay);
 }
 
 // ── Lecture des valeurs ────────────────────────────────────────
@@ -416,7 +437,7 @@ function updateCompare(current) {
   const prev = history[lastKey];
 
   el.compareSection().hidden = false;
-  el.compareMonthLabel().textContent = monthLabel(lastKey);
+  el.compareMonthLabel().textContent = periodLabel(lastKey);
 
   const fields = [
     { id: 'totalCharges', label: 'totalCharges', format: fmt },
@@ -452,7 +473,7 @@ function saveHistory(history) {
 function save(computed) {
   const fields = {};
   ids.forEach(id => { fields[id] = document.getElementById(id).value; });
-  const entry = { month: currentMonthKey(), fields, ...computed };
+  const entry = { period: currentPeriodKey(resetDay), fields, ...computed };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
   syncToCloud(STORAGE_KEY, entry);
 }
@@ -462,13 +483,15 @@ function archiveAndReset() {
   if (!raw) return;
   try {
     const stored = JSON.parse(raw);
-    if (!stored.month || stored.month === currentMonthKey()) return;
+    const currentKey = currentPeriodKey(resetDay);
+    const storedKey  = stored.period || stored.month; // compat ancien format
+    if (!storedKey || storedKey === currentKey) return;
 
     const sousDecoteReportee    = stored.sousDecote    ?? 0;
     const detteRestanteReportee = stored.detteRestante ?? 0;
 
     const history = loadHistory();
-    history[stored.month] = {
+    history[storedKey] = {
       totalCharges:  stored.totalCharges  ?? 0,
       resteAVivre:   stored.resteAVivre   ?? 0,
       sousDecote:    sousDecoteReportee,
@@ -487,7 +510,8 @@ function restore() {
   if (!raw) return;
   try {
     const stored = JSON.parse(raw);
-    if (stored.month !== currentMonthKey()) return;
+    const storedKey = stored.period || stored.month;
+    if (storedKey !== currentPeriodKey(resetDay)) return;
     ids.forEach(id => {
       if (stored.fields?.[id] !== undefined) document.getElementById(id).value = stored.fields[id];
     });
@@ -616,7 +640,7 @@ async function loadFromCloud() {
 }
 
 async function migrateLocalToCloud() {
-  for (const key of [STORAGE_KEY, HISTORY_KEY, SUBS_KEY, GOAL_KEY]) {
+  for (const key of [STORAGE_KEY, HISTORY_KEY, SUBS_KEY, GOAL_KEY, RESET_DAY_KEY]) {
     const raw = localStorage.getItem(key);
     if (raw) {
       try { await syncToCloud(key, JSON.parse(raw)); } catch {}
@@ -626,7 +650,9 @@ async function migrateLocalToCloud() {
 
 // ── Init données app ───────────────────────────────────────────
 function initAppData() {
-  el.headerMonth().textContent = monthLabel(currentMonthKey());
+  resetDay = loadResetDay();
+  const rdInput = document.getElementById('resetDay');
+  if (rdInput) rdInput.value = resetDay;
 
   subs = loadSubs();
   renderSubs();
@@ -637,6 +663,8 @@ function initAppData() {
 
   archiveAndReset();
   restore();
+
+  el.headerMonth().textContent = periodLabel(currentPeriodKey(resetDay));
   refresh();
 }
 
@@ -663,6 +691,13 @@ document.addEventListener('DOMContentLoaded', () => {
   el.goalNom().addEventListener('input',     () => { goal.nom     = el.goalNom().value;     saveGoal(); });
   el.goalMontant().addEventListener('input', () => { goal.montant = el.goalMontant().value; saveGoal(); refresh(); });
   ids.forEach(id => { document.getElementById(id).addEventListener('input', refresh); });
+  document.getElementById('resetDay').addEventListener('change', () => {
+    const v = Math.max(1, Math.min(28, parseInt(document.getElementById('resetDay').value) || 1));
+    document.getElementById('resetDay').value = v;
+    resetDay = v;
+    saveResetDay();
+    el.headerMonth().textContent = periodLabel(currentPeriodKey(resetDay));
+  });
   el.btnReset().addEventListener('click',             reset);
   el.btnAddSub().addEventListener('click',            addSub);
   el.btnAppliquerDette().addEventListener('click',    applyDebtPayment);
