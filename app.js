@@ -3,6 +3,7 @@ const HISTORY_KEY    = 'budgetHistory';
 const SUBS_KEY       = 'budgetSubscriptions';
 const GOAL_KEY       = 'budgetGoal';
 const RESET_DAY_KEY  = 'budgetResetDay';
+const THEME_KEY      = 'budgetTheme';
 
 // ── Supabase ────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://pgocmfqnatzsxyihkjra.supabase.co';
@@ -696,6 +697,23 @@ function fmt(n) {
   return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 }
 
+// ── Thème sombre / clair ───────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('btnTheme').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem(THEME_KEY, next);
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'light';
+  applyTheme(saved);
+}
+
 // ── Auth ────────────────────────────────────────────────────────
 let authMode = 'login';
 
@@ -825,6 +843,9 @@ function clearAppData() {
 
 // ── Init ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  loadTheme();
+  document.getElementById('btnTheme').addEventListener('click', toggleTheme);
+
   // Auth UI
   document.getElementById('tabLogin').addEventListener('click',  () => setAuthMode('login'));
   document.getElementById('tabSignup').addEventListener('click', () => setAuthMode('signup'));

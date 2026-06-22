@@ -2,6 +2,7 @@
 :root {
   --color-bg:           #f0f4f8;
   --color-card:         #ffffff;
+  --color-input-bg:     #ffffff;
   --color-primary:      #4f46e5;
   --color-primary-light:#eef2ff;
   --color-primary-hover:#4338ca;
@@ -15,6 +16,25 @@
   --color-input-focus:  #4f46e5;
   --radius:             14px;
   --shadow:             0 1px 3px rgba(0,0,0,.06), 0 6px 24px rgba(0,0,0,.08);
+}
+
+/* ── Mode sombre ────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --color-bg:           #0f172a;
+  --color-card:         #1e293b;
+  --color-input-bg:     #0f172a;
+  --color-primary:      #818cf8;
+  --color-primary-light:#1e1b4b;
+  --color-primary-hover:#a5b4fc;
+  --color-success:      #34d399;
+  --color-success-light:#064e3b;
+  --color-danger:       #f87171;
+  --color-danger-light: #450a0a;
+  --color-text:         #f1f5f9;
+  --color-text-muted:   #94a3b8;
+  --color-border:       #334155;
+  --color-input-focus:  #818cf8;
+  --shadow:             0 1px 3px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.4);
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */
@@ -68,6 +88,22 @@ body {
   transition: background .15s;
 }
 .btn-logout:hover { background: rgba(255,255,255,.25); }
+
+.btn-theme {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.12);
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-theme:hover { background: rgba(255,255,255,.25); }
 
 /* ── Grid principal ─────────────────────────────────────────── */
 .main-grid {
@@ -128,7 +164,7 @@ body {
   border-radius: 9px;
   font-size: .95rem;
   color: var(--color-text);
-  background: #fff;
+  background: var(--color-input-bg);
   transition: border-color .15s, box-shadow .15s;
   outline: none;
 }
@@ -334,7 +370,7 @@ body {
   border-radius: 8px;
   font-size: .88rem;
   color: var(--color-text);
-  background: #fff;
+  background: var(--color-input-bg);
   outline: none;
   min-width: 0;
 }
@@ -348,7 +384,7 @@ body {
   border-radius: 8px;
   font-size: .88rem;
   color: var(--color-text);
-  background: #fff;
+  background: var(--color-input-bg);
   outline: none;
 }
 .goal-target:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
@@ -360,7 +396,7 @@ body {
   height: 26px;
   border-radius: 6px;
   border: 1.5px solid var(--color-border);
-  background: #fff;
+  background: var(--color-input-bg);
   font-size: .8rem;
   cursor: pointer;
   display: flex;
@@ -389,7 +425,7 @@ body {
   border-radius: 8px;
   font-size: .9rem;
   color: var(--color-text);
-  background: #fff;
+  background: var(--color-input-bg);
   outline: none;
   transition: border-color .15s;
 }
