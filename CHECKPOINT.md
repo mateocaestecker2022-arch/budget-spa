@@ -72,6 +72,18 @@
 
 ---
 
+## Fonctionnalités planifiées
+
+### Système de comptes (synchronisation multi-appareils)
+
+- **Pourquoi** : les données sont actuellement en localStorage, propre à chaque navigateur/appareil — l'utilisateur ne retrouve pas ses saisies en changeant de téléphone/ordinateur.
+- **Approche validée** : compte avec email/mot de passe via **Supabase** (Auth + base Postgres), pas Firebase/Google — choix explicite de l'utilisateur pour ne pas dépendre de Google. Sécurité équivalente (Postgres, hashage des mots de passe, Row Level Security).
+- **Statut** : plan validé ("go"), en attente que l'utilisateur configure son projet Supabase (étapes communiquées : création compte/projet, table SQL `budget_data` avec RLS par `user_id`, récupération de l'URL projet + clé `anon public`).
+- **Une fois les clés fournies** : écran de connexion/inscription (email + mot de passe) avant l'accès à l'app, synchronisation de toutes les données (budget courant, historique, abonnements, objectif) dans le cloud, localStorage conservé comme cache local pour le fonctionnement hors-ligne, migration automatique des données locales existantes au premier login.
+- **Ce qui ne change pas pour les futurs utilisateurs** : la configuration Supabase est unique (faite une fois par le créateur de l'app) — tout utilisateur de l'app n'a qu'à créer un compte simple (email + mot de passe), sans aucune manipulation technique.
+
+---
+
 ## Décisions techniques
 
 - **Stack** : HTML5 + CSS + JavaScript vanilla + Chart.js
@@ -157,7 +169,8 @@
 - Dépenses variables
 - Export CSV / Excel / PDF
 - Synchronisation bancaire
-- Comptes utilisateurs
+
+> Comptes utilisateurs : déplacé vers "Fonctionnalités planifiées" ci-dessus — en cours de mise en place (Supabase).
 
 ## Dépôt GitHub
 
