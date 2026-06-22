@@ -51,6 +51,8 @@ body {
 
 /* ── Header ────────────────────────────────────────────────── */
 .header {
+  position: relative;
+  z-index: 200;
   background: var(--color-primary);
   color: #fff;
   padding: 1.25rem 2rem;
