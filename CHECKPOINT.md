@@ -172,6 +172,7 @@
 - Dépenses variables
 - Export CSV / Excel / PDF
 - Synchronisation bancaire
+- Amélioration du mode sombre/clair (transitions, palette affinée, préférence système `prefers-color-scheme`)
 
 > Comptes utilisateurs : déplacé vers "Fonctionnalités planifiées" ci-dessus — en cours de mise en place (Supabase).
 
