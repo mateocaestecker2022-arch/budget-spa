@@ -137,43 +137,26 @@
         <canvas id="budgetChart" aria-label="Répartition du budget"></canvas>
       </div>
 
+      <!-- Conseils (sous la légende du graphique) -->
+      <div class="conseils-inner">
+        <h3 class="section-label">Conseils</h3>
+        <ul class="conseils-list" id="conseilsList"></ul>
+      </div>
+
     </section>
 
-    <!-- Objectif d'épargne -->
-    <section class="card card--goal" id="goalSection" aria-label="Objectif d'épargne">
-      <h2 class="card-title">Objectif d'épargne</h2>
+    <!-- Objectifs d'épargne -->
+    <section class="card card--goal" id="goalSection" aria-label="Objectifs d'épargne">
+      <h2 class="card-title">Objectifs d'épargne</h2>
 
-      <div class="goal-inputs-grid">
-        <div class="form-group">
-          <label for="goalNom">Nom de l'objectif</label>
-          <input type="text" id="goalNom" placeholder="ex: Voyage au Japon" />
-        </div>
-        <div class="form-group">
-          <label for="goalMontant">Montant cible (€)</label>
-          <input type="number" id="goalMontant" min="0" step="1" placeholder="ex: 10000" />
-        </div>
+      <div class="result-item">
+        <span class="result-label">Capacité d'épargne ce mois</span>
+        <span class="result-value" id="capaciteEpargne">0 €</span>
       </div>
 
-      <div class="progress-section">
-        <div class="progress-header">
-          <span id="goalProgressLabel">0 € / 0 €</span>
-          <span id="goalProgressPctLabel">0 %</span>
-        </div>
-        <div class="progress-bar" id="goalProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div class="progress-fill" id="goalProgressFill"></div>
-        </div>
-      </div>
+      <div id="goalsList"></div>
 
-      <div class="goal-results-grid">
-        <div class="result-item">
-          <span class="result-label">Capacité d'épargne ce mois</span>
-          <span class="result-value" id="capaciteEpargne">0 €</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Estimation</span>
-          <span class="result-value" id="goalEstimation">—</span>
-        </div>
-      </div>
+      <button class="btn-add-sub" id="btnAddGoal" type="button">+ Ajouter un objectif</button>
     </section>
 
     <!-- Abonnements -->
@@ -297,12 +280,6 @@
       </div>
 
       <button class="btn-apply-dispatch" id="btnAppliquerDispatch" type="button">Appliquer la répartition</button>
-    </section>
-
-    <!-- Conseils -->
-    <section class="card card--conseils" id="conseilsSection" aria-label="Conseils">
-      <h2 class="card-title">Conseils</h2>
-      <ul class="conseils-list" id="conseilsList"></ul>
     </section>
 
     <!-- Comparaison mois précédent -->

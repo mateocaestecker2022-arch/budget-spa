@@ -11,7 +11,7 @@ const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 
 let subs = [];
-let goal = { nom: '', montant: '' };
+let goals = [];
 let resetDay = 1;
 
 const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
@@ -38,14 +38,9 @@ const el = {
   subsList:             () => document.getElementById('subsList'),
   subsTotal:            () => document.getElementById('subsTotal'),
   btnAddSub:            () => document.getElementById('btnAddSub'),
-  goalNom:              () => document.getElementById('goalNom'),
-  goalMontant:          () => document.getElementById('goalMontant'),
-  goalProgressLabel:    () => document.getElementById('goalProgressLabel'),
-  goalProgressPctLabel: () => document.getElementById('goalProgressPctLabel'),
-  goalProgressFill:     () => document.getElementById('goalProgressFill'),
-  goalProgressBar:      () => document.getElementById('goalProgressBar'),
+  goalsList:            () => document.getElementById('goalsList'),
+  btnAddGoal:           () => document.getElementById('btnAddGoal'),
   capaciteEpargne:      () => document.getElementById('capaciteEpargne'),
-  goalEstimation:       () => document.getElementById('goalEstimation'),
   primeMontantTotal:    () => document.getElementById('primeMontantTotal'),
   btnAppliquerPrime:    () => document.getElementById('btnAppliquerPrime'),
   totalCharges:         () => document.getElementById('totalCharges'),
@@ -170,14 +165,164 @@ function addSub() {
   el.subsList().querySelector('.subs-row:last-child .subs-name')?.focus();
 }
 
-// ── Objectif d'épargne ──────────────────────────────────────────
-function loadGoal() {
-  try { return JSON.parse(localStorage.getItem(GOAL_KEY)) || { nom: '', montant: '' }; } catch { return { nom: '', montant: '' }; }
+// ── Objectifs d'épargne ──────────────────────────────────────────
+function genGoalId() {
+  return Date.now() + Math.random().toString(36).slice(2);
 }
 
-function saveGoal() {
-  localStorage.setItem(GOAL_KEY, JSON.stringify(goal));
-  syncToCloud(GOAL_KEY, goal);
+function loadGoals() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(GOAL_KEY));
+    if (!parsed) return [];
+    // Migration ancien format objet → tableau
+    if (!Array.isArray(parsed)) {
+      if (parsed.nom || parsed.montant) return [{ id: genGoalId(), nom: parsed.nom || '', montant: parsed.montant || '' }];
+      return [];
+    }
+    return parsed;
+  } catch { return []; }
+}
+
+function saveGoals() {
+  localStorage.setItem(GOAL_KEY, JSON.stringify(goals));
+  syncToCloud(GOAL_KEY, goals);
+}
+
+function addGoal() {
+  goals.push({ id: genGoalId(), nom: '', montant: '' });
+  saveGoals();
+  refresh();
+  el.goalsList().querySelector('.goal-item:last-child .goal-name')?.focus();
+}
+
+function renderGoals(sousDecote, capaciteEpargne) {
+  const list = el.goalsList();
+  list.innerHTML = '';
+
+  if (goals.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'goals-empty';
+    p.textContent = 'Aucun objectif — ajoute-en un ci-dessous.';
+    list.appendChild(p);
+    return;
+  }
+
+  let remaining = sousDecote;
+
+  goals.forEach((g, idx) => {
+    const target = Math.max(0, parseFloat(g.montant) || 0);
+    const filled = Math.min(remaining, target);
+    const pct    = target > 0 ? Math.min(100, (filled / target) * 100) : 0;
+    const left   = Math.max(0, target - filled);
+    const months = capaciteEpargne > 0 && left > 0 ? Math.ceil(left / capaciteEpargne) : null;
+    remaining = Math.max(0, remaining - filled);
+
+    const item = document.createElement('div');
+    item.className = 'goal-item';
+
+    // ─ Header : badge + nom + montant + boutons
+    const header = document.createElement('div');
+    header.className = 'goal-item-header';
+
+    const badge = document.createElement('span');
+    badge.className = 'goal-priority';
+    badge.textContent = idx + 1;
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'goal-name';
+    nameInput.placeholder = 'ex: Voyage au Japon';
+    nameInput.value = g.nom;
+    nameInput.setAttribute('aria-label', 'Nom de l\'objectif');
+    nameInput.addEventListener('input', () => { g.nom = nameInput.value; saveGoals(); });
+
+    const targetInput = document.createElement('input');
+    targetInput.type = 'number';
+    targetInput.className = 'goal-target';
+    targetInput.min = '0';
+    targetInput.step = '1';
+    targetInput.placeholder = 'ex: 10000';
+    targetInput.value = g.montant;
+    targetInput.setAttribute('aria-label', 'Montant cible (€)');
+    targetInput.addEventListener('input', () => { g.montant = targetInput.value; saveGoals(); refresh(); });
+
+    const actions = document.createElement('div');
+    actions.className = 'goal-actions';
+
+    const upBtn = document.createElement('button');
+    upBtn.type = 'button';
+    upBtn.className = 'goal-btn goal-btn--move';
+    upBtn.textContent = '↑';
+    upBtn.setAttribute('aria-label', 'Priorité plus haute');
+    upBtn.disabled = idx === 0;
+    upBtn.addEventListener('click', () => {
+      [goals[idx - 1], goals[idx]] = [goals[idx], goals[idx - 1]];
+      saveGoals(); refresh();
+    });
+
+    const downBtn = document.createElement('button');
+    downBtn.type = 'button';
+    downBtn.className = 'goal-btn goal-btn--move';
+    downBtn.textContent = '↓';
+    downBtn.setAttribute('aria-label', 'Priorité plus basse');
+    downBtn.disabled = idx === goals.length - 1;
+    downBtn.addEventListener('click', () => {
+      [goals[idx], goals[idx + 1]] = [goals[idx + 1], goals[idx]];
+      saveGoals(); refresh();
+    });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'goal-btn goal-btn--remove';
+    removeBtn.textContent = '×';
+    removeBtn.setAttribute('aria-label', 'Supprimer cet objectif');
+    removeBtn.addEventListener('click', () => {
+      goals = goals.filter(og => og.id !== g.id);
+      saveGoals(); refresh();
+    });
+
+    actions.append(upBtn, downBtn, removeBtn);
+    header.append(badge, nameInput, targetInput, actions);
+
+    // ─ Barre de progression
+    const progressSection = document.createElement('div');
+    progressSection.className = 'goal-progress';
+
+    const progressHeader = document.createElement('div');
+    progressHeader.className = 'progress-header';
+    const labelLeft = document.createElement('span');
+    labelLeft.textContent = `${fmt(filled)} / ${fmt(target)}`;
+    const labelRight = document.createElement('span');
+    labelRight.textContent = Math.round(pct) + ' %';
+    progressHeader.append(labelLeft, labelRight);
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.setAttribute('role', 'progressbar');
+    progressBar.setAttribute('aria-valuemin', '0');
+    progressBar.setAttribute('aria-valuemax', '100');
+    progressBar.setAttribute('aria-valuenow', Math.round(pct));
+    const progressFill = document.createElement('div');
+    progressFill.className = 'progress-fill';
+    progressFill.style.width = pct + '%';
+    progressBar.appendChild(progressFill);
+
+    const estimation = document.createElement('p');
+    estimation.className = 'goal-estimation';
+    if (target <= 0) {
+      estimation.textContent = 'Définis un montant cible';
+    } else if (filled >= target) {
+      estimation.textContent = '✓ Objectif atteint !';
+    } else if (months === null) {
+      estimation.textContent = 'Pas d\'estimation possible';
+    } else {
+      estimation.textContent = `Encore ${months} mois à ce rythme`;
+    }
+
+    progressSection.append(progressHeader, progressBar, estimation);
+    item.append(header, progressSection);
+    list.appendChild(item);
+  });
 }
 
 // ── Calculs ────────────────────────────────────────────────────
@@ -210,17 +355,13 @@ function compute() {
   const dispatchAmtSousDecote = dispatchBase * dispatchPctSousDecote / 100;
   const dispatchAmtDette      = dispatchBase * dispatchPctDette / 100;
 
-  const goalMontant     = Math.max(0, parseFloat(goal.montant) || 0);
   const capaciteEpargne = salaire - totalCharges;
-  const goalProgressPct = goalMontant > 0 ? Math.min(100, (sousDecote / goalMontant) * 100) : 0;
-  const goalRemaining   = Math.max(0, goalMontant - sousDecote);
-  const goalMonthsLeft  = capaciteEpargne > 0 ? Math.ceil(goalRemaining / capaciteEpargne) : null;
 
   return {
     salaire, loyer, nourriture, assurance, dette, facture, autres, sousDecote, detteRestante, abonnements,
     totalCharges, resteAVivre,
     prime, primeMontantEpargne, primeMontantSousDecote, primeMontantReste, primeMontantDette, primeMontantTotal,
-    goalMontant, capaciteEpargne, goalProgressPct, goalRemaining, goalMonthsLeft,
+    capaciteEpargne,
     dispatchBase, dispatchPctSousDecote, dispatchPctDette, dispatchPctTotal, dispatchAmtSousDecote, dispatchAmtDette,
   };
 }
@@ -309,26 +450,10 @@ function applyPrime() {
   refresh();
 }
 
-// ── Objectif d'épargne ──────────────────────────────────────────
+// ── Objectifs d'épargne ──────────────────────────────────────────
 function updateGoal(data) {
-  const { sousDecote, goalMontant, capaciteEpargne, goalProgressPct, goalMonthsLeft } = data;
-
-  el.capaciteEpargne().textContent = fmt(capaciteEpargne);
-  el.goalProgressLabel().textContent    = `${fmt(sousDecote)} / ${fmt(goalMontant)}`;
-  el.goalProgressPctLabel().textContent = Math.round(goalProgressPct) + ' %';
-  el.goalProgressFill().style.width     = goalProgressPct + '%';
-  el.goalProgressBar().setAttribute('aria-valuenow', Math.round(goalProgressPct));
-
-  const estEl = el.goalEstimation();
-  if (goalMontant <= 0) {
-    estEl.textContent = 'Définis un montant cible';
-  } else if (sousDecote >= goalMontant) {
-    estEl.textContent = 'Objectif atteint !';
-  } else if (goalMonthsLeft === null) {
-    estEl.textContent = 'Pas d\'estimation possible';
-  } else {
-    estEl.textContent = `Encore ${goalMonthsLeft} mois à ce rythme`;
-  }
+  el.capaciteEpargne().textContent = fmt(data.capaciteEpargne);
+  renderGoals(data.sousDecote, data.capaciteEpargne);
 }
 
 // ── Graphique Chart.js ─────────────────────────────────────────
@@ -377,7 +502,7 @@ function updateChart(data) {
 
 // ── Conseils ─────────────────────────────────────────────────────
 function computeConseils(data) {
-  const { salaire, loyer, totalCharges, sousDecote, detteRestante, dette, abonnements, capaciteEpargne, dispatchPctTotal, goalMontant } = data;
+  const { salaire, loyer, totalCharges, sousDecote, detteRestante, dette, abonnements, capaciteEpargne, dispatchPctTotal } = data;
   const conseils = [];
 
   if (salaire > 0 && loyer > salaire * 0.33) {
@@ -407,7 +532,7 @@ function computeConseils(data) {
     conseils.push({ type: 'info', text: `Tu as une capacité d'épargne de ${fmt(capaciteEpargne)} ce mois — pense à la répartir vers Sous de côté / Dette dans "Répartition du reste à vivre".` });
   }
 
-  if (goalMontant <= 0 && capaciteEpargne > 0) {
+  if (goals.length === 0 && capaciteEpargne > 0) {
     conseils.push({ type: 'info', text: `Tu as une capacité d'épargne positive mais aucun objectif d'épargne défini — pense à en créer un.` });
   }
 
@@ -659,9 +784,7 @@ function initAppData() {
   subs = loadSubs();
   renderSubs();
 
-  goal = loadGoal();
-  el.goalNom().value     = goal.nom     || '';
-  el.goalMontant().value = goal.montant || '';
+  goals = loadGoals();
 
   archiveAndReset();
   restore();
@@ -674,9 +797,7 @@ function clearAppData() {
   ids.forEach(id => { const domEl = document.getElementById(id); if (domEl) domEl.value = ''; });
   subs = [];
   renderSubs();
-  goal = { nom: '', montant: '' };
-  el.goalNom().value     = '';
-  el.goalMontant().value = '';
+  goals = [];
   if (chart) { chart.destroy(); chart = null; }
 }
 
@@ -690,8 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnLogout').addEventListener('click', () => _sb.auth.signOut());
 
   // App inputs
-  el.goalNom().addEventListener('input',     () => { goal.nom     = el.goalNom().value;     saveGoal(); });
-  el.goalMontant().addEventListener('input', () => { goal.montant = el.goalMontant().value; saveGoal(); refresh(); });
+  el.btnAddGoal().addEventListener('click', addGoal);
   ids.forEach(id => { document.getElementById(id).addEventListener('input', refresh); });
   document.getElementById('resetDay').addEventListener('change', () => {
     const v = Math.max(1, Math.min(28, parseInt(document.getElementById('resetDay').value) || 1));

@@ -264,21 +264,97 @@ body {
   margin-top: .5rem;
 }
 
-/* ── Objectif d'épargne ────────────────────────────────────── */
+/* ── Objectifs d'épargne ───────────────────────────────────── */
 .card--goal {
   grid-column: span 2;
 }
 
-.goal-inputs-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: .75rem;
+.goals-empty {
+  font-size: .85rem;
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
-.goal-results-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .75rem;
+.goal-item {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  padding: .85rem;
+  background: var(--color-bg);
+  border-radius: 10px;
+  margin-bottom: .5rem;
+}
+
+.goal-item-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.goal-priority {
+  font-size: .75rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.goal-name {
+  flex: 1;
+  padding: .5rem .75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  font-size: .9rem;
+  color: var(--color-text);
+  background: #fff;
+  outline: none;
+  min-width: 0;
+}
+.goal-name:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+
+.goal-target {
+  width: 110px;
+  flex: none;
+  padding: .5rem .75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  font-size: .9rem;
+  color: var(--color-text);
+  background: #fff;
+  outline: none;
+}
+.goal-target:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+
+.goal-actions { display: flex; gap: .25rem; flex-shrink: 0; }
+
+.goal-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  font-size: .85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.goal-btn:disabled { opacity: .35; cursor: not-allowed; }
+.goal-btn--move:hover:not(:disabled) { background: var(--color-primary-light); border-color: var(--color-primary); color: var(--color-primary); }
+.goal-btn--remove:hover { background: var(--color-danger-light); border-color: var(--color-danger); color: var(--color-danger); }
+
+.goal-progress { display: flex; flex-direction: column; gap: .35rem; }
+
+.goal-estimation {
+  font-size: .78rem;
+  color: var(--color-text-muted);
 }
 
 /* ── Abonnements ───────────────────────────────────────────── */
@@ -475,8 +551,11 @@ body {
 .btn-apply-dispatch:hover { background: #ddd6fe; }
 
 /* ── Conseils ──────────────────────────────────────────────── */
-.card--conseils {
-  grid-column: span 2;
+.conseils-inner {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
 }
 
 .conseils-list {
@@ -688,9 +767,10 @@ body {
   .prime-split-grid { grid-template-columns: 1fr 1fr; }
   .btn-apply-prime  { width: 100%; text-align: center; padding: .85rem; font-size: .95rem; }
 
-  /* Objectif d'épargne */
+  /* Objectifs d'épargne */
   .card--goal       { grid-column: span 1; }
-  .goal-inputs-grid { grid-template-columns: 1fr; }
+  .goal-item-header { flex-wrap: wrap; }
+  .goal-target      { width: 90px; }
 
   /* Abonnements */
   .card--subs { grid-column: span 1; }
@@ -707,9 +787,6 @@ body {
   /* Répartition du reste à vivre */
   .card--dispatch { grid-column: span 1; }
   .btn-apply-dispatch { width: 100%; text-align: center; padding: .85rem; font-size: .95rem; }
-
-  /* Conseils */
-  .card--conseils { grid-column: span 1; }
 
   /* Bouton reset */
   .btn-reset {
