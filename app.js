@@ -844,7 +844,6 @@ function clearAppData() {
 // ── Init ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadTheme();
-  document.getElementById('btnTheme').addEventListener('click', toggleTheme);
 
   // Auth UI
   document.getElementById('tabLogin').addEventListener('click',  () => setAuthMode('login'));
