@@ -1,6 +1,6 @@
 # CHECKPOINT — Gestionnaire de Budget Personnel
 
-## État actuel : Session 2026-06-22 — TERMINÉ ✅
+## État actuel : Session 2026-06-23 — TERMINÉ ✅
 
 ---
 
@@ -74,6 +74,16 @@
 | + | Objectifs d'épargne multiples avec priorité et distribution en cascade | ✅ Terminé |
 | + | Conseils intégrés sous la légende du graphique | ✅ Terminé |
 | + | Redesign 3 colonnes + design raffiné (validé) | ✅ Terminé |
+| + | Adaptation complète couleurs mode sombre/clair (variables CSS) | ✅ Terminé |
+| + | Accordéon déroulant Abonnements + Dette (grid-template-rows) | ✅ Terminé |
+| + | Réinitialisation sélective (salaire + prime uniquement) | ✅ Terminé |
+
+### 2026-06-23 — Thème, accordéon, reset sélectif
+
+- [x] **Adaptation complète des couleurs au mode sombre/clair** : toutes les couleurs codées en dur remplacées par des variables CSS (`--color-placeholder`, `--color-alert-border`, `--color-focus-ring`, `--color-primary-glow`, `--color-conseil-warning/info/success-text`, `--color-btn-add-hover`) avec valeurs distinctes pour `:root` (clair) et `[data-theme="dark"]` (sombre) ; transitions douces 0.25s ajoutées sur body, cartes et inputs
+- [x] **Accordéon déroulant sur les cartes Abonnements et Dette** : clic sur le titre pour replier/déplier ; chevron animé (rotation −90°) ; animation via `grid-template-rows: 1fr → 0fr` ; état collapsed persisté en localStorage (`budgetCollapse`) ; carte entièrement compacte au repli (gap et padding-bottom supprimés via `.collapsible-section.collapsed`)
+- [x] **Réinitialisation mensuelle sélective** : le bouton reset n'efface plus les charges fixes (loyer, nourriture, assurance, factures, autres, remboursement mensuel) ; seuls salaire, prime et ses champs de répartition, et les % dispatch sont remis à zéro
+- [x] **Cache-buster** : `style.css?v=2` + `app.js?v=6` pour forcer le rechargement sur GitHub Pages
 
 ### 2026-06-22 (suite) — Comptes Supabase, objectifs multiples, redesign
 - [x] **Authentification Supabase** : écran login/signup (email + mot de passe) avant l'app ; table `budget_data` Postgres + Row Level Security par `user_id` ; localStorage conservé comme cache offline ; migration automatique des données locales au premier login ; client nommé `_sb` pour éviter le conflit avec l'export CDN `window.supabase`
