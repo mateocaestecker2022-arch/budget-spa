@@ -670,12 +670,10 @@ function restore() {
 }
 
 // ── Réinitialisation du mois ───────────────────────────────────
+const RESET_IDS = ['salaire', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
+
 function reset() {
-  const sousDecote    = val('sousDecote');
-  const detteRestante = val('detteRestante');
-  ids.forEach(id => { document.getElementById(id).value = ''; });
-  document.getElementById('sousDecote').value    = sousDecote    || '';
-  document.getElementById('detteRestante').value = detteRestante || '';
+  RESET_IDS.forEach(id => { document.getElementById(id).value = ''; });
   localStorage.removeItem(STORAGE_KEY);
   refresh();
 }
