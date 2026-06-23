@@ -161,46 +161,54 @@
     </section>
 
     <!-- Abonnements -->
-    <section class="card" id="subsSection" aria-label="Abonnements">
-      <h2 class="card-title">Abonnements</h2>
-
-      <div class="subs-list" id="subsList"></div>
-
-      <button class="btn-add-sub" id="btnAddSub" type="button">+ Ajouter un abonnement</button>
-
-      <div class="subs-total-row">
-        <span class="result-label">Total abonnements</span>
-        <span class="result-value" id="subsTotal">0 €</span>
+    <section class="card collapsible-section" id="subsSection" aria-label="Abonnements">
+      <h2 class="card-title card-title--collapsible" onclick="toggleSection('subsSection')">
+        Abonnements <span class="card-chevron">▼</span>
+      </h2>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div class="subs-list" id="subsList"></div>
+          <button class="btn-add-sub" id="btnAddSub" type="button">+ Ajouter un abonnement</button>
+          <div class="subs-total-row">
+            <span class="result-label">Total abonnements</span>
+            <span class="result-value" id="subsTotal">0 €</span>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Dette -->
-    <section class="card" id="debtSection" aria-label="Dette">
-      <h2 class="card-title">Dette</h2>
+    <section class="card collapsible-section" id="debtSection" aria-label="Dette">
+      <h2 class="card-title card-title--collapsible" onclick="toggleSection('debtSection')">
+        Dette <span class="card-chevron">▼</span>
+      </h2>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div class="form-group">
+            <label for="detteRestante">Dette restante (total) (€)</label>
+            <input type="number" id="detteRestante" min="0" step="1" placeholder="ex: 5000" />
+          </div>
 
-      <div class="form-group">
-        <label for="detteRestante">Dette restante (total) (€)</label>
-        <input type="number" id="detteRestante" min="0" step="1" placeholder="ex: 5000" />
-      </div>
+          <div class="form-group">
+            <label for="dette">Remboursement mensuel (€)</label>
+            <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
+          </div>
 
-      <div class="form-group">
-        <label for="dette">Remboursement mensuel (€)</label>
-        <input type="number" id="dette" min="0" step="1" placeholder="ex: 200" />
-      </div>
+          <h3 class="section-label">Remboursement ponctuel</h3>
 
-      <h3 class="section-label">Remboursement ponctuel</h3>
+          <div class="debt-extra-row">
+            <div class="form-group">
+              <label for="detteRemboursementExtra">Montant à remettre dans la dette (€)</label>
+              <input type="number" id="detteRemboursementExtra" min="0" step="1" placeholder="ex: 100" />
+            </div>
+            <button class="btn-apply-debt" id="btnAppliquerDette" type="button">Appliquer au total</button>
+          </div>
 
-      <div class="debt-extra-row">
-        <div class="form-group">
-          <label for="detteRemboursementExtra">Montant à remettre dans la dette (€)</label>
-          <input type="number" id="detteRemboursementExtra" min="0" step="1" placeholder="ex: 100" />
+          <div class="result-item result-item--wide">
+            <span class="result-label">Dette restante</span>
+            <span class="result-value" id="detteRestanteDisplay">0 €</span>
+          </div>
         </div>
-        <button class="btn-apply-debt" id="btnAppliquerDette" type="button">Appliquer au total</button>
-      </div>
-
-      <div class="result-item result-item--wide">
-        <span class="result-label">Dette restante</span>
-        <span class="result-value" id="detteRestanteDisplay">0 €</span>
       </div>
     </section>
 
@@ -307,6 +315,6 @@
 
   </main>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

@@ -441,6 +441,41 @@ body {
 
 .goal-estimation { font-size: .76rem; color: var(--color-text-muted); }
 
+/* ── Accordéon (sections déroulantes) ──────────────────────── */
+.card-title--collapsible {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title--collapsible:hover { color: var(--color-primary-hover); }
+
+.card-chevron {
+  font-size: .7rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-left: .5rem;
+  transition: transform .3s ease, color .15s;
+}
+
+.card-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows .35s ease;
+  overflow: hidden;
+}
+.card-body-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+}
+
+.collapsible-section.collapsed .card-body  { grid-template-rows: 0fr; }
+.collapsible-section.collapsed .card-chevron { transform: rotate(-90deg); }
+
 /* ── Abonnements ────────────────────────────────────────────── */
 .subs-list { display: flex; flex-direction: column; gap: .45rem; }
 

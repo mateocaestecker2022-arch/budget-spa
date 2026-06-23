@@ -4,6 +4,7 @@ const SUBS_KEY       = 'budgetSubscriptions';
 const GOAL_KEY       = 'budgetGoal';
 const RESET_DAY_KEY  = 'budgetResetDay';
 const THEME_KEY      = 'budgetTheme';
+const COLLAPSE_KEY   = 'budgetCollapse';
 
 // ── Supabase ────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://pgocmfqnatzsxyihkjra.supabase.co';
@@ -697,6 +698,32 @@ function fmt(n) {
   return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 }
 
+// ── Accordéon ─────────────────────────────────────────────────
+const COLLAPSIBLE_SECTIONS = ['subsSection', 'debtSection'];
+
+function toggleSection(sectionId) {
+  document.getElementById(sectionId).classList.toggle('collapsed');
+  saveCollapseState();
+}
+
+function saveCollapseState() {
+  const state = {};
+  COLLAPSIBLE_SECTIONS.forEach(id => {
+    state[id] = document.getElementById(id).classList.contains('collapsed');
+  });
+  localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state));
+}
+
+function restoreCollapseState() {
+  try {
+    const state = JSON.parse(localStorage.getItem(COLLAPSE_KEY)) || {};
+    COLLAPSIBLE_SECTIONS.forEach(id => {
+      if (state[id]) document.getElementById(id).classList.add('collapsed');
+    });
+  } catch {}
+}
+window.toggleSection = toggleSection;
+
 // ── Thème sombre / clair ───────────────────────────────────
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
@@ -827,6 +854,7 @@ function initAppData() {
 
   goals = loadGoals();
 
+  restoreCollapseState();
   archiveAndReset();
   restore();
 
