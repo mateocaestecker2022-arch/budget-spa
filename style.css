@@ -14,6 +14,15 @@
   --color-text-muted:   #64748b;
   --color-border:       #e2e8f0;
   --color-input-focus:  #4f46e5;
+  --color-placeholder:  #c1c9d4;
+  --color-alert-border: #fca5a5;
+  --color-focus-ring:   rgba(79,70,229,.12);
+  --color-primary-glow: rgba(79,70,229,.25);
+  --color-primary-glow-strong: rgba(79,70,229,.35);
+  --color-conseil-warning-text: #991b1b;
+  --color-conseil-info-text:    #3730a3;
+  --color-conseil-success-text: #065f46;
+  --color-btn-add-hover:#ddd6fe;
   --radius:             14px;
   --shadow:             0 1px 3px rgba(0,0,0,.06), 0 6px 24px rgba(0,0,0,.08);
 }
@@ -34,6 +43,15 @@
   --color-text-muted:   #94a3b8;
   --color-border:       #334155;
   --color-input-focus:  #818cf8;
+  --color-placeholder:  #475569;
+  --color-alert-border: #7f1d1d;
+  --color-focus-ring:   rgba(129,140,248,.2);
+  --color-primary-glow: rgba(129,140,248,.3);
+  --color-primary-glow-strong: rgba(129,140,248,.4);
+  --color-conseil-warning-text: #fca5a5;
+  --color-conseil-info-text:    #a5b4fc;
+  --color-conseil-success-text: #6ee7b7;
+  --color-btn-add-hover:#312e81;
   --shadow:             0 1px 3px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.4);
 }
 
@@ -47,6 +65,15 @@ body {
   color: var(--color-text);
   min-height: 100vh;
   line-height: 1.5;
+  transition: background .25s, color .25s;
+}
+
+.card, .auth-card, .auth-overlay, .result-item, .compare-item, .goal-item {
+  transition: background .25s, box-shadow .25s, border-color .25s;
+}
+
+.form-group input, .goal-name, .goal-target, .subs-row input {
+  transition: border-color .15s, box-shadow .15s, background .25s, color .25s;
 }
 
 /* ── Header ────────────────────────────────────────────────── */
@@ -60,7 +87,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 2px 12px rgba(79,70,229,.25);
+  box-shadow: 0 2px 12px var(--color-primary-glow);
 }
 
 .header-content { text-align: center; flex: 1; }
@@ -173,10 +200,10 @@ body {
 
 .form-group input:focus {
   border-color: var(--color-input-focus);
-  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
-.form-group input::placeholder { color: #c1c9d4; }
+.form-group input::placeholder { color: var(--color-placeholder); }
 
 /* ── Jour de réinitialisation ───────────────────────────────── */
 .reset-day-row { display: flex; align-items: center; gap: .5rem; }
@@ -203,7 +230,7 @@ body {
 .alert {
   background: var(--color-danger-light);
   color: var(--color-danger);
-  border: 1.5px solid #fca5a5;
+  border: 1.5px solid var(--color-alert-border);
   border-radius: 9px;
   padding: .7rem 1rem;
   font-size: .88rem;
@@ -313,19 +340,19 @@ body {
 .conseil-item--warning {
   background: var(--color-danger-light);
   border-left-color: var(--color-danger);
-  color: #991b1b;
+  color: var(--color-conseil-warning-text);
 }
 
 .conseil-item--info {
   background: var(--color-primary-light);
   border-left-color: var(--color-primary);
-  color: #3730a3;
+  color: var(--color-conseil-info-text);
 }
 
 .conseil-item--success {
   background: var(--color-success-light);
   border-left-color: var(--color-success);
-  color: #065f46;
+  color: var(--color-conseil-success-text);
 }
 
 /* ── Objectifs d'épargne ────────────────────────────────────── */
@@ -376,7 +403,7 @@ body {
   outline: none;
   min-width: 0;
 }
-.goal-name:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+.goal-name:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px var(--color-focus-ring); }
 
 .goal-target {
   width: 100px;
@@ -389,7 +416,7 @@ body {
   background: var(--color-input-bg);
   outline: none;
 }
-.goal-target:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+.goal-target:focus { border-color: var(--color-input-focus); box-shadow: 0 0 0 3px var(--color-focus-ring); }
 
 .goal-actions { display: flex; gap: .2rem; flex-shrink: 0; }
 
@@ -433,7 +460,7 @@ body {
 }
 .subs-row input:focus {
   border-color: var(--color-input-focus);
-  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .subs-name   { flex: 1; }
@@ -479,7 +506,7 @@ body {
   cursor: pointer;
   transition: background .15s;
 }
-.btn-add-sub:hover { background: #ddd6fe; }
+.btn-add-sub:hover { background: var(--color-btn-add-hover); }
 
 /* ── Boutons d'action (appliquer) ───────────────────────────── */
 .btn-apply-prime,
@@ -495,13 +522,13 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: background .15s, box-shadow .15s;
-  box-shadow: 0 2px 8px rgba(79,70,229,.25);
+  box-shadow: 0 2px 8px var(--color-primary-glow);
 }
 .btn-apply-prime:hover,
 .btn-apply-debt:hover,
 .btn-apply-dispatch:hover {
   background: var(--color-primary-hover);
-  box-shadow: 0 4px 12px rgba(79,70,229,.35);
+  box-shadow: 0 4px 12px var(--color-primary-glow-strong);
 }
 
 /* ── Prime ──────────────────────────────────────────────────── */
@@ -627,7 +654,7 @@ body {
   font-weight: 700;
   cursor: pointer;
   transition: background .15s, box-shadow .15s;
-  box-shadow: 0 2px 8px rgba(79,70,229,.25);
+  box-shadow: 0 2px 8px var(--color-primary-glow);
 }
 .btn-auth:hover    { background: var(--color-primary-hover); }
 .btn-auth:disabled { opacity: .6; cursor: not-allowed; box-shadow: none; }
