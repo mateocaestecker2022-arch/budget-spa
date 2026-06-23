@@ -459,6 +459,13 @@ body {
   transition: transform .3s ease, color .15s;
 }
 
+.collapsible-section {
+  gap: 0;
+  padding-bottom: 1.5rem;
+  transition: background .25s, box-shadow .25s, border-color .25s, padding-bottom .35s ease;
+}
+.collapsible-section.collapsed { padding-bottom: 0; }
+
 .card-body {
   display: grid;
   grid-template-rows: 1fr;
@@ -471,9 +478,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: .9rem;
+  padding-top: .65rem;
 }
 
-.collapsible-section.collapsed .card-body  { grid-template-rows: 0fr; }
+.collapsible-section.collapsed .card-body    { grid-template-rows: 0fr; }
 .collapsible-section.collapsed .card-chevron { transform: rotate(-90deg); }
 
 /* ── Abonnements ────────────────────────────────────────────── */
