@@ -16,13 +16,14 @@ let subs = [];
 let goals = [];
 let resetDay = 1;
 
-const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
+const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'essence', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
 
 const el = {
   salaire:              () => document.getElementById('salaire'),
   loyer:                () => document.getElementById('loyer'),
   nourriture:           () => document.getElementById('nourriture'),
   assurance:            () => document.getElementById('assurance'),
+  essence:              () => document.getElementById('essence'),
   dette:                () => document.getElementById('dette'),
   facture:              () => document.getElementById('facture'),
   autres:               () => document.getElementById('autres'),
@@ -349,6 +350,7 @@ function compute() {
   const loyer      = val('loyer');
   const nourriture = val('nourriture');
   const assurance  = val('assurance');
+  const essence    = val('essence');
   const dette      = val('dette');
   const facture    = val('facture');
   const autres     = val('autres');
@@ -363,7 +365,7 @@ function compute() {
   const primeMontantDette      = val('primeMontantDette');
   const primeMontantTotal      = primeMontantEpargne + primeMontantSousDecote + primeMontantReste + primeMontantDette;
 
-  const totalCharges = loyer + nourriture + assurance + dette + facture + autres + abonnements;
+  const totalCharges = loyer + nourriture + assurance + essence + dette + facture + autres + abonnements;
   const resteAVivre  = salaire - totalCharges;
 
   const dispatchPctSousDecote = val('dispatchPctSousDecote');
@@ -376,7 +378,7 @@ function compute() {
   const capaciteEpargne = salaire - totalCharges;
 
   return {
-    salaire, loyer, nourriture, assurance, dette, facture, autres, sousDecote, detteRestante, abonnements,
+    salaire, loyer, nourriture, assurance, essence, dette, facture, autres, sousDecote, detteRestante, abonnements,
     totalCharges, resteAVivre,
     prime, primeMontantEpargne, primeMontantSousDecote, primeMontantReste, primeMontantDette, primeMontantTotal,
     capaciteEpargne,
@@ -482,12 +484,12 @@ function updateGoal(data) {
 
 // ── Graphique Chart.js ─────────────────────────────────────────
 function updateChart(data) {
-  const { loyer, nourriture, assurance, dette, facture, autres, abonnements, resteAVivre } = data;
+  const { loyer, nourriture, assurance, essence, dette, facture, autres, abonnements, resteAVivre } = data;
 
   const restePositif = Math.max(0, resteAVivre);
-  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Dette', 'Factures', 'Autres', 'Abonnements', 'Reste à vivre'];
-  const values = [loyer, nourriture, assurance, dette, facture, autres, abonnements, restePositif];
-  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e', '#0ea5e9', '#a3e635'];
+  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Essence', 'Dette', 'Factures', 'Autres', 'Abonnements', 'Reste à vivre'];
+  const values = [loyer, nourriture, assurance, essence, dette, facture, autres, abonnements, restePositif];
+  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#ef4444', '#8b5cf6', '#f43f5e', '#0ea5e9', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;

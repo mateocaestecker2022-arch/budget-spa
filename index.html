@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestionnaire de Budget</title>
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -74,6 +74,11 @@
       <div class="form-group">
         <label for="assurance">Assurance (€)</label>
         <input type="number" id="assurance" min="0" step="1" placeholder="ex: 150" />
+      </div>
+
+      <div class="form-group">
+        <label for="essence">Essence (€)</label>
+        <input type="number" id="essence" min="0" step="1" placeholder="ex: 80" />
       </div>
 
       <div class="form-group">
@@ -315,6 +320,6 @@
 
   </main>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
