@@ -1,6 +1,6 @@
 # CHECKPOINT — Gestionnaire de Budget Personnel
 
-## État actuel : Session 2026-06-23 — TERMINÉ ✅
+## État actuel : Session 2026-06-24 — TERMINÉ ✅
 
 ---
 
@@ -77,6 +77,12 @@
 | + | Adaptation complète couleurs mode sombre/clair (variables CSS) | ✅ Terminé |
 | + | Accordéon déroulant Abonnements + Dette (grid-template-rows) | ✅ Terminé |
 | + | Réinitialisation sélective (salaire + prime uniquement) | ✅ Terminé |
+| + | Champ Essence dans les charges fixes | ✅ Terminé |
+
+### 2026-06-24 — Champ Essence
+
+- [x] **Nouveau champ "Essence (€)"** : ajouté dans les charges fixes (entre Assurance et Factures), intégré au calcul du Total charges, visible dans le graphique Chart.js (couleur orange `#f97316`), sauvegardé/restauré via localStorage et Supabase, conservé au reset mensuel comme les autres charges fixes
+- [x] **Cache-buster** : `style.css?v=3` + `app.js?v=7`
 
 ### 2026-06-23 — Thème, accordéon, reset sélectif
 
