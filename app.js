@@ -11,12 +11,13 @@ const SUPABASE_URL = 'https://pgocmfqnatzsxyihkjra.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ps_okVLusVNEmopxXA8s1A_DUFutwlH';
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
+let appInitialized = false;
 
 let subs = [];
 let goals = [];
 let resetDay = 1;
 
-const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'essence', 'dette', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
+const ids = ['salaire', 'loyer', 'nourriture', 'assurance', 'essence', 'facture', 'autres', 'sousDecote', 'detteRestante', 'detteRemboursementExtra', 'chargesPonctuelles', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
 
 const el = {
   salaire:              () => document.getElementById('salaire'),
@@ -24,7 +25,6 @@ const el = {
   nourriture:           () => document.getElementById('nourriture'),
   assurance:            () => document.getElementById('assurance'),
   essence:              () => document.getElementById('essence'),
-  dette:                () => document.getElementById('dette'),
   facture:              () => document.getElementById('facture'),
   autres:               () => document.getElementById('autres'),
   sousDecote:           () => document.getElementById('sousDecote'),
@@ -351,11 +351,11 @@ function compute() {
   const nourriture = val('nourriture');
   const assurance  = val('assurance');
   const essence    = val('essence');
-  const dette      = val('dette');
   const facture    = val('facture');
   const autres     = val('autres');
   const sousDecote = val('sousDecote');
   const detteRestante = val('detteRestante');
+  const chargesPonctuelles = val('chargesPonctuelles');
   const abonnements = subsTotalAmount();
 
   const prime                  = val('prime');
@@ -365,8 +365,8 @@ function compute() {
   const primeMontantDette      = val('primeMontantDette');
   const primeMontantTotal      = primeMontantEpargne + primeMontantSousDecote + primeMontantReste + primeMontantDette;
 
-  const totalCharges = loyer + nourriture + assurance + essence + dette + facture + autres + abonnements;
-  const resteAVivre  = salaire - totalCharges;
+  const totalCharges = loyer + nourriture + assurance + essence + facture + autres + abonnements;
+  const resteAVivre  = salaire - totalCharges - chargesPonctuelles;
 
   const dispatchPctSousDecote = val('dispatchPctSousDecote');
   const dispatchPctDette      = val('dispatchPctDette');
@@ -378,7 +378,7 @@ function compute() {
   const capaciteEpargne = salaire - totalCharges;
 
   return {
-    salaire, loyer, nourriture, assurance, essence, dette, facture, autres, sousDecote, detteRestante, abonnements,
+    salaire, loyer, nourriture, assurance, essence, facture, autres, sousDecote, detteRestante, chargesPonctuelles, abonnements,
     totalCharges, resteAVivre,
     prime, primeMontantEpargne, primeMontantSousDecote, primeMontantReste, primeMontantDette, primeMontantTotal,
     capaciteEpargne,
@@ -411,6 +411,7 @@ function applyDebtPayment() {
   const next = Math.max(0, val('detteRestante') - extra);
   el.detteRestante().value = next || '';
   el.detteRemboursementExtra().value = '';
+  document.getElementById('chargesPonctuelles').value = val('chargesPonctuelles') + extra;
   refresh();
 }
 
@@ -440,6 +441,7 @@ function applyDispatch() {
   el.detteRestante().value = newDetteRestante || '';
   document.getElementById('dispatchPctSousDecote').value = '';
   document.getElementById('dispatchPctDette').value = '';
+  document.getElementById('chargesPonctuelles').value = val('chargesPonctuelles') + dispatchAmtSousDecote + dispatchAmtDette;
   refresh();
 }
 
@@ -484,12 +486,12 @@ function updateGoal(data) {
 
 // ── Graphique Chart.js ─────────────────────────────────────────
 function updateChart(data) {
-  const { loyer, nourriture, assurance, essence, dette, facture, autres, abonnements, resteAVivre } = data;
+  const { loyer, nourriture, assurance, essence, facture, autres, abonnements, resteAVivre } = data;
 
   const restePositif = Math.max(0, resteAVivre);
-  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Essence', 'Dette', 'Factures', 'Autres', 'Abonnements', 'Reste à vivre'];
-  const values = [loyer, nourriture, assurance, essence, dette, facture, autres, abonnements, restePositif];
-  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#ef4444', '#8b5cf6', '#f43f5e', '#0ea5e9', '#a3e635'];
+  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Essence', 'Factures', 'Autres', 'Abonnements', 'Reste à vivre'];
+  const values = [loyer, nourriture, assurance, essence, facture, autres, abonnements, restePositif];
+  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#f43f5e', '#0ea5e9', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;
@@ -528,7 +530,7 @@ function updateChart(data) {
 
 // ── Conseils ─────────────────────────────────────────────────────
 function computeConseils(data) {
-  const { salaire, loyer, totalCharges, sousDecote, detteRestante, dette, abonnements, capaciteEpargne, dispatchPctTotal } = data;
+  const { salaire, loyer, totalCharges, sousDecote, detteRestante, abonnements, capaciteEpargne, dispatchPctTotal } = data;
   const conseils = [];
 
   if (salaire > 0 && loyer > salaire * 0.33) {
@@ -540,14 +542,7 @@ function computeConseils(data) {
   }
 
   if (detteRestante > 0) {
-    if (dette > 0) {
-      const moisRestants = Math.ceil(detteRestante / dette);
-      if (moisRestants > 24) {
-        conseils.push({ type: 'warning', text: `Au rythme actuel (${fmt(dette)}/mois), il te faudra encore ${moisRestants} mois pour rembourser ta dette — augmente le remboursement mensuel ou fais un remboursement ponctuel.` });
-      }
-    } else {
-      conseils.push({ type: 'warning', text: `Tu as une dette restante de ${fmt(detteRestante)} mais aucun remboursement mensuel défini.` });
-    }
+    conseils.push({ type: 'info', text: `Tu as une dette restante de ${fmt(detteRestante)} — utilise le remboursement ponctuel pour la réduire.` });
   }
 
   if (salaire > 0 && abonnements > salaire * 0.1) {
@@ -626,7 +621,7 @@ function saveHistory(history) {
 function save(computed) {
   const fields = {};
   ids.forEach(id => { fields[id] = document.getElementById(id).value; });
-  const entry = { period: currentPeriodKey(resetDay), fields, ...computed };
+  const entry = { period: currentPeriodKey(resetDay), fields, ...computed, saved_at: Date.now() };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
   syncToCloud(STORAGE_KEY, entry);
 }
@@ -829,6 +824,20 @@ async function loadFromCloud() {
       return;
     }
     data.forEach(({ key, value }) => {
+      if (key === STORAGE_KEY) {
+        const localRaw = localStorage.getItem(key);
+        if (localRaw) {
+          try {
+            const local = JSON.parse(localRaw);
+            const cloudTime = value?.saved_at ?? 0;
+            const localTime = local?.saved_at ?? 0;
+            if (cloudTime > localTime) {
+              localStorage.setItem(key, JSON.stringify(value));
+            }
+            return;
+          } catch {}
+        }
+      }
       localStorage.setItem(key, JSON.stringify(value));
     });
   } catch {}
@@ -900,19 +909,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth state
   _sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
-      currentUser = session?.user ?? null;
+      const newUser = session?.user ?? null;
+      const userChanged = newUser?.id !== currentUser?.id;
+      currentUser = newUser;
       if (currentUser) {
         document.getElementById('headerUserEmail').textContent = currentUser.email;
         document.getElementById('headerUser').hidden = false;
-        await loadFromCloud();
-        showApp();
-        initAppData();
+        if (!appInitialized || userChanged) {
+          appInitialized = true;
+          await loadFromCloud();
+          showApp();
+          initAppData();
+        }
       } else {
         // Pas de session au démarrage
         showAuth();
       }
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
+      appInitialized = false;
       document.getElementById('headerUser').hidden = true;
       clearAppData();
       showAuth();
