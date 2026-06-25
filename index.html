@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestionnaire de Budget</title>
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -208,6 +208,21 @@
             <span class="result-label">Dette restante</span>
             <span class="result-value" id="detteRestanteDisplay">0 €</span>
           </div>
+
+          <div class="result-item result-item--wide">
+            <span class="result-label">Remboursé ce mois</span>
+            <span class="result-value result-value--debt" id="rembourseCeMoisDisplay">0 €</span>
+          </div>
+
+          <h3 class="section-label">Corriger un remboursement</h3>
+
+          <div class="debt-extra-row">
+            <div class="form-group">
+              <label for="correctionRemboursement">Montant à récupérer (€)</label>
+              <input type="number" id="correctionRemboursement" min="0" step="1" placeholder="ex: 300" />
+            </div>
+            <button class="btn-apply-debt btn-apply-debt--cancel" id="btnAnnulerRemboursement" type="button">Annuler</button>
+          </div>
         </div>
       </div>
     </section>
@@ -318,6 +333,6 @@
 
   </main>
 
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

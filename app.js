@@ -402,6 +402,9 @@ function updateDOM(data) {
   el.detteRestanteResult().textContent  = fmt(data.detteRestante);
   el.subsTotal().textContent            = fmt(data.abonnements);
   el.detteRestanteDisplay().textContent = fmt(data.detteRestante);
+
+  const rembourseCeMoisEl = document.getElementById('rembourseCeMoisDisplay');
+  if (rembourseCeMoisEl) rembourseCeMoisEl.textContent = fmt(data.chargesPonctuelles);
 }
 
 // ── Remboursement ponctuel de dette ────────────────────────────
@@ -412,6 +415,17 @@ function applyDebtPayment() {
   el.detteRestante().value = next || '';
   el.detteRemboursementExtra().value = '';
   document.getElementById('chargesPonctuelles').value = val('chargesPonctuelles') + extra;
+  refresh();
+}
+
+// ── Correction remboursement ───────────────────────────────────
+function annulerRemboursement() {
+  const montant = val('correctionRemboursement');
+  if (montant <= 0) return;
+  const newCP = Math.max(0, val('chargesPonctuelles') - montant);
+  document.getElementById('chargesPonctuelles').value = newCP || '';
+  el.detteRestante().value = (val('detteRestante') + montant) || '';
+  document.getElementById('correctionRemboursement').value = '';
   refresh();
 }
 
@@ -486,12 +500,12 @@ function updateGoal(data) {
 
 // ── Graphique Chart.js ─────────────────────────────────────────
 function updateChart(data) {
-  const { loyer, nourriture, assurance, essence, facture, autres, abonnements, resteAVivre } = data;
+  const { loyer, nourriture, assurance, essence, facture, autres, abonnements, chargesPonctuelles, resteAVivre } = data;
 
   const restePositif = Math.max(0, resteAVivre);
-  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Essence', 'Factures', 'Autres', 'Abonnements', 'Reste à vivre'];
-  const values = [loyer, nourriture, assurance, essence, facture, autres, abonnements, restePositif];
-  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#f43f5e', '#0ea5e9', '#a3e635'];
+  const labels = ['Loyer', 'Nourriture', 'Assurance', 'Essence', 'Factures', 'Autres', 'Abonnements', 'Remboursements', 'Reste à vivre'];
+  const values = [loyer, nourriture, assurance, essence, facture, autres, abonnements, chargesPonctuelles, restePositif];
+  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#f43f5e', '#0ea5e9', '#dc2626', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;
@@ -512,7 +526,13 @@ function updateChart(data) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 12, usePointStyle: true } },
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { size: 12 }, padding: 12, usePointStyle: true,
+            filter: (item, chartData) => chartData.datasets[0].data[item.index] > 0,
+          },
+        },
         tooltip: {
           callbacks: {
             label(ctx) {
@@ -907,6 +927,7 @@ document.addEventListener('DOMContentLoaded', () => {
   el.btnReset().addEventListener('click',             reset);
   el.btnAddSub().addEventListener('click',            addSub);
   el.btnAppliquerDette().addEventListener('click',    applyDebtPayment);
+  document.getElementById('btnAnnulerRemboursement').addEventListener('click', annulerRemboursement);
   el.btnAppliquerDispatch().addEventListener('click', applyDispatch);
   el.btnAppliquerPrime().addEventListener('click',    applyPrime);
 
