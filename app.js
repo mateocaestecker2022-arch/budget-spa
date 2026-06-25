@@ -420,10 +420,12 @@ function applyDebtPayment() {
 
 // ── Correction remboursement ───────────────────────────────────
 function annulerRemboursement() {
-  const montant = val('correctionRemboursement');
-  if (montant <= 0) return;
-  const newCP = Math.max(0, val('chargesPonctuelles') - montant);
-  document.getElementById('chargesPonctuelles').value = newCP || '';
+  const current = val('chargesPonctuelles');
+  if (current <= 0) return;
+  const inputRaw = parseFloat(document.getElementById('correctionRemboursement').value) || 0;
+  // Si aucun montant saisi, annule tout
+  const montant = inputRaw > 0 ? Math.min(inputRaw, current) : current;
+  document.getElementById('chargesPonctuelles').value = (current - montant) || '';
   el.detteRestante().value = (val('detteRestante') + montant) || '';
   document.getElementById('correctionRemboursement').value = '';
   refresh();
@@ -505,7 +507,7 @@ function updateChart(data) {
   const restePositif = Math.max(0, resteAVivre);
   const labels = ['Loyer', 'Nourriture', 'Assurance', 'Essence', 'Factures', 'Autres', 'Abonnements', 'Remboursements', 'Reste à vivre'];
   const values = [loyer, nourriture, assurance, essence, facture, autres, abonnements, chargesPonctuelles, restePositif];
-  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#f43f5e', '#0ea5e9', '#dc2626', '#a3e635'];
+  const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#14b8a6', '#0ea5e9', '#dc2626', '#a3e635'];
 
   if (chart) {
     chart.data.labels = labels;
