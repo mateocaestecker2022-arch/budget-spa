@@ -1,6 +1,6 @@
 # CHECKPOINT — Gestionnaire de Budget Personnel
 
-## État actuel : Session 2026-06-24 — TERMINÉ ✅
+## État actuel : Session 2026-06-25 — TERMINÉ ✅
 
 ---
 
@@ -78,6 +78,23 @@
 | + | Accordéon déroulant Abonnements + Dette (grid-template-rows) | ✅ Terminé |
 | + | Réinitialisation sélective (salaire + prime uniquement) | ✅ Terminé |
 | + | Champ Essence dans les charges fixes | ✅ Terminé |
+| + | Suppression remboursement mensuel dette | ✅ Terminé |
+| + | Charges ponctuelles (impact sur Reste à vivre) | ✅ Terminé |
+| + | Fix sync Supabase (saved_at + appInitialized) | ✅ Terminé |
+| + | Audit approfondi + corrections critiques | ✅ Terminé |
+
+### 2026-06-25 — Refonte dette + charges ponctuelles + audit
+
+- [x] **Suppression du champ "Remboursement mensuel" de la carte Dette** : devenu inutile, retiré de ids, el, compute(), totalCharges, graphique, conseils
+- [x] **Nouveau champ caché `chargesPonctuelles`** : accumule ce mois les remboursements ponctuels de dette et les répartitions appliquées, déduit du Reste à vivre (`resteAVivre = salaire − totalCharges − chargesPonctuelles`)
+- [x] **Fix persistance Supabase** : timestamp `saved_at: Date.now()` ajouté dans `save()` + comparaison `>=` dans `loadFromCloud()` pour éviter l'écrasement par de vieilles données cloud (y compris anciennes entrées sans saved_at)
+- [x] **Fix double-init Supabase** : guard `appInitialized` empêche `SIGNED_IN` de réinitialiser l'app en cours de session
+- [x] **Audit approfondi (8 angles)** + corrections issues critiques :
+  - `chargesPonctuelles` ajouté à `RESET_IDS` (reset manuel l'effaçait pas → alerte fausse)
+  - `catch {}` vide dans `loadFromCloud` corrigé (fallthrough sur écrasement local si parse error)
+  - Input `type=number display:none` → `type=hidden` (hors flux de grille CSS)
+  - CLAUDE.md mis à jour (formules dette/essence/chargesPonctuelles)
+- [x] **Cache-buster** : `app.js?v=11`
 
 ### 2026-06-24 — Champ Essence
 
