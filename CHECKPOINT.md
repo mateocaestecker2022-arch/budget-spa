@@ -83,6 +83,14 @@
 | + | Fix sync Supabase (saved_at + appInitialized) | ✅ Terminé |
 | + | Audit approfondi + corrections critiques | ✅ Terminé |
 
+### 2026-06-25 (suite) — Légende remboursements + correction ponctuelle
+
+- [x] **Segment "Remboursements" dans le graphique** : nouveau segment rouge (#dc2626) pour `chargesPonctuelles` ; filtre de légende Chart.js (segments à 0 € masqués)
+- [x] **Couleur "Autres" changée** : #f43f5e (rouge-rosé) → #14b8a6 (teal) pour différencier de "Remboursements" (rouge)
+- [x] **Affichage "Remboursé ce mois"** dans la carte Dette (rouge, id `rembourseCeMoisDisplay`)
+- [x] **Section "Corriger un remboursement"** : bouton Annuler réduit `chargesPonctuelles` (récupère le montant dans le Reste à vivre) et restaure `detteRestante` ; si le champ est vide, annule la totalité
+- [x] **Cache-buster** : `app.js?v=13` / `style.css?v=4`
+
 ### 2026-06-25 — Refonte dette + charges ponctuelles + audit
 
 - [x] **Suppression du champ "Remboursement mensuel" de la carte Dette** : devenu inutile, retiré de ids, el, compute(), totalCharges, graphique, conseils
