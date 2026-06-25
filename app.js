@@ -667,7 +667,7 @@ function restore() {
 }
 
 // ── Réinitialisation du mois ───────────────────────────────────
-const RESET_IDS = ['salaire', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette'];
+const RESET_IDS = ['salaire', 'prime', 'primeMontantEpargne', 'primeMontantSousDecote', 'primeMontantReste', 'primeMontantDette', 'dispatchPctSousDecote', 'dispatchPctDette', 'chargesPonctuelles'];
 
 function reset() {
   RESET_IDS.forEach(id => { document.getElementById(id).value = ''; });
@@ -831,11 +831,15 @@ async function loadFromCloud() {
             const local = JSON.parse(localRaw);
             const cloudTime = value?.saved_at ?? 0;
             const localTime = local?.saved_at ?? 0;
-            if (cloudTime > localTime) {
+            if (cloudTime >= localTime) {
               localStorage.setItem(key, JSON.stringify(value));
             }
             return;
-          } catch {}
+          } catch {
+            // parse error : laisser le cloud gagner
+          }
+          localStorage.setItem(key, JSON.stringify(value));
+          return;
         }
       }
       localStorage.setItem(key, JSON.stringify(value));

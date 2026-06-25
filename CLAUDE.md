@@ -13,16 +13,17 @@ Application web monopage (SPA) de suivi budgétaire mensuel, 100 % côté client
 
 ## Règles de calcul (impératives)
 ```
-Total charges   = Loyer + Nourriture + Assurance + Dette + Factures + Autres + Abonnements
-Reste à vivre   = Salaire − Total charges
-Alerte          = si Reste à vivre < 0
+Total charges        = Loyer + Nourriture + Assurance + Essence + Factures + Autres + Abonnements
+Charges ponctuelles  = cumul mensuel des remboursements ponctuels de dette + répartitions appliquées
+Reste à vivre        = Salaire − Total charges − Charges ponctuelles
+Alerte               = si Reste à vivre < 0
 ```
 
 ## Exigences fonctionnelles v1.0
 | Code | Exigence | Priorité |
 |---|---|---|
 | EF-01 | Saisir le salaire mensuel net | Haute |
-| EF-02 | Saisir les charges fixes (loyer, nourriture, assurance, dette) | Haute |
+| EF-02 | Saisir les charges fixes (loyer, nourriture, assurance, essence, factures, autres) | Haute |
 | EF-04 | Calculer le total des charges en temps réel | Haute |
 | EF-05 | Calculer le reste à vivre | Haute |
 | EF-06 | Afficher la répartition en graphique (Chart.js) | Haute |
